@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -79,6 +80,12 @@ public final class WebViewer extends AndroidViewComponent {
     webview.setFocusable(true);
     // enable pinch zooming and zoom controls
     webview.getSettings().setBuiltInZoomControls(true);
+    
+    // enable plugins support. API is different from level 8+
+    if (SdkLevel.getLevel() >= SdkLevel.LEVEL_FROYO)
+    	webview.getSettings().setPluginState(WebSettings.PluginState.ON);
+    else
+    	webview.getSettings().setPluginsEnabled(true);
 
     if (SdkLevel.getLevel() >= SdkLevel.LEVEL_ECLAIR)
       EclairUtil.setupWebViewGeoLoc(this, webview, container.$context());

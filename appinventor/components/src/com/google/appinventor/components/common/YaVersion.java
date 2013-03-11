@@ -215,8 +215,10 @@ public class YaVersion {
   // - NOTIFIER_COMPONENT_VERSION was incremented to 2.
   // For YOUNG_ANDROID_VERSION 72:
   // - WEBVIEWER_COMPONENT_VERSION was incremented to 3
+  // For YOUNG_ANDROID_VERSION 73:
+  // - WEBVIEWER_COMPONENT_VERSION was incremented to 4
 
-  public static final int YOUNG_ANDROID_VERSION = 72;
+  public static final int YOUNG_ANDROID_VERSION = 73;
 
   // ............................... Blocks Language Version Number ...............................
 
@@ -604,6 +606,8 @@ public class YaVersion {
   // - The CanGoForward and CanGoBack methods were added
   // For WEBVIEWER_COMPONENT_VERSION 3:
   // - Add UsesLocation property to set location permissions
-  public static final int WEBVIEWER_COMPONENT_VERSION = 3;
+  //For WEBVIEWER_COMPONENT_VERSION 4:
+  // - Adds plugins support
+  public static final int WEBVIEWER_COMPONENT_VERSION = 4;
 
 }
