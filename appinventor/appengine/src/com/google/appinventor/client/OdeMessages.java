@@ -2278,6 +2278,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String bluetoothServerComponentPallette();
 
+  @DefaultMessage("Firebase")
+  @Description("")
+  String firebaseComponentPallette();
+
   @DefaultMessage("Notifier")
   @Description("")
   String notifierComponentPallette();
@@ -4991,6 +4995,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String RequestTranslationMethods();
 
+  @DefaultMessage("DoAll")
+  @Description("")
+  String DoAllMethods();
+
 
   //Mock Components
   @DefaultMessage("add items...")
@@ -5266,6 +5274,9 @@ public interface OdeMessages extends Messages {
   @Description("")
   String YandexTranslateHelpStringComponentPallette();
 
+  @DefaultMessage("Use this component to communicate with a Firebase app. This component needs Internet access.")
+  @Description("")
+  String FirebaseHelpStringComponentPallette();
 
   //Ode.java messages
   @DefaultMessage("Welcome to App Inventor 2!")

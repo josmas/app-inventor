@@ -164,6 +164,8 @@ public class TranslationDesignerPallete {
       value = MESSAGES.tinyWebDBComponentPallette();
     } else if (key.equals("Web")) {
       value = MESSAGES.webComponentPallette();
+    } else if (key.equals("Firebase")) {
+      value = MESSAGES.firebaseComponentPallette();
       // Not ready for prime time
     } else if (key.equals("File")) {
       value = MESSAGES.fileComponentPallette();
@@ -308,6 +310,8 @@ public class TranslationDesignerPallete {
       value = MESSAGES.WebViewerHelpStringComponentPallette();
     } else if (key.equals("YandexTranslate-helpString")) {
       value = MESSAGES.YandexTranslateHelpStringComponentPallette();
+    } else if (key.equals("Firebase-helpString")) {
+      value = MESSAGES.FirebaseHelpStringComponentPallette();
     }
     return value;
   }

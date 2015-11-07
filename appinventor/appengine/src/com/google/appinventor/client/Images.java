@@ -502,4 +502,9 @@ public interface Images extends Resources {
   @Source("com/google/appinventor/images/proximitysensor.png")
   ImageResource proximitysensor();
 
+  /**
+   * Designer palette item: firebase component
+   */
+  @Source("com/google/appinventor/images/firebase.png")
+  ImageResource firebaseComponent();
 }

@@ -358,8 +358,10 @@ public class YaVersion {
   // For YOUNG_ANDROID_VERSION 140:
   // - HORIZONTALARRANGEMENT_COMPONENT_VERSION was incremented to 3.
   // - VERTICALARRANGEMENT_COMPONENT_VERSION was incremented to 3
+  // For YOUNG_ANDROID_VERSION 141:
+  // - FIREBASE_COMPONENT_VERSION was incremented to 1
 
-  public static final int YOUNG_ANDROID_VERSION = 140;
+  public static final int YOUNG_ANDROID_VERSION = 141;
 
   // ............................... Blocks Language Version Number ...............................
 
@@ -954,6 +956,9 @@ public class YaVersion {
 
   //For PROXIMITYSENSOR_COMPONENT_VERSION: Initial Version
   public static final int PROXIMITYSENSOR_COMPONENT_VERSION = 1;
+
+  //For FIREBASE_COMPONENT_VERSION: Initial Version
+  public static final int FIREBASE_COMPONENT_VERSION = 1;
 
   // Rendezvous Server Location
 
