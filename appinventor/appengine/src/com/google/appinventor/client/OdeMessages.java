@@ -3794,6 +3794,17 @@ public interface OdeMessages extends Messages {
   String textToTranslateParams();
 
   //Events
+
+  //TODO Firebase events - probably move from here FIXME
+  @DefaultMessage("FirebaseError")
+  @Description("")
+  String FirebaseErrorEvents();
+
+//  @DefaultMessage("GotValue")
+//  @Description("")
+//  String GotValueEvents(); //TODO (jos) it's already defined for other component
+
+
   @DefaultMessage("AccelerationChanged")
   @Description("")
   String AccelerationChangedEvents();
@@ -4999,6 +5010,13 @@ public interface OdeMessages extends Messages {
   @Description("")
   String DoAllMethods();
 
+//  @DefaultMessage("GetValue")
+//  @Description("")
+//  String GetValueMethods(); //TODO (jos) already defined for a different component FIXME
+
+  @DefaultMessage("SetValue")
+  @Description("")
+  String SetValueMethods();
 
   //Mock Components
   @DefaultMessage("add items...")
@@ -5516,6 +5534,16 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("SelectionColor")
   @Description("")
   String SelectionColorProperties();
+
+  @DefaultMessage("FirebaseUrl")
+  @Description("")
+  String FirebaseUrlProperties();
+
+
+  @DefaultMessage("firebaseUrl")
+  @Description("")
+  String firebaseUrlParams();
+
 
   // Missing translations from 4/8/2015 -- Should sort into appropriate place
 

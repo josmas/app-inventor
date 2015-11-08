@@ -188,6 +188,7 @@ public final class ErrorMessages {
 
   // Please start the next group of error numbers at 3001.
 
+  public static final int ERROR_NO_FIREBASE_URL = 3001;
 
   // Mapping of error numbers to error message format strings.
   private static final Map<Integer, String> errorMessages;
@@ -463,6 +464,8 @@ public final class ErrorMessages {
        "TextToSpeech is not yet ready to perform this operation");
     // AndroidViewComponent errors
     errorMessages.put(ERROR_BAD_PERCENT, "Percent values should be between 0 and 100.");
+    // FirebaseComponent errors
+    errorMessages.put(ERROR_NO_FIREBASE_URL, "No URL, or Invalid URL set for Firebase; App cannot work without one.");
   }
 
   private ErrorMessages() {
