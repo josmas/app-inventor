@@ -484,6 +484,7 @@ public interface Images extends Resources {
    */
   @Source("com/google/appinventor/images/procedures.png")
   ImageResource procedures();
+
   /**
     * Designer palette item: MediaStore
     */
@@ -513,5 +514,11 @@ public interface Images extends Resources {
    */
   @Source("com/google/appinventor/images/proximitysensor.png")
   ImageResource proximitysensor();
+
+  /**
+   * Designer palette item: AerogearPush
+   */
+  @Source("com/google/appinventor/images/aerogearPush.png")
+  ImageResource aerogearPush();
 
 }
