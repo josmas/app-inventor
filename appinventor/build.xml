@@ -110,6 +110,7 @@
         <pathelement location="lib/twitter/twitter4j-media-support-3.0.5.jar" />
         <pathelement location="lib/aerogear/aerogear-android-push-2.2.2.jar" />
         <pathelement location="lib/aerogear/aerogear-android-core-2.1.0.jar" />
+        <pathelement location="lib/aerogear/aerogear-android-pipe-2.1.0.jar" />
         <pathelement location="lib/playservices/stripped-play-services-6.1.11.jar" />
         <pathelement location="lib/QRGenerator/core.jar" />
         <pathelement location="lib/QRGenerator/javase.jar" />

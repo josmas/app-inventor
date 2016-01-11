@@ -191,7 +191,10 @@ public final class ErrorMessages {
   // Image errors
   public static final int ERROR_IMAGE_CANNOT_ROTATE = 3001;
 
-  // Start the next group of errors at 3100
+  // Aerogear Push
+  public static final int ERROR_AEROGEARPUSH_EXCEPTION = 3101;
+
+  // Start the next group of errors at 3200
 
   // Mapping of error numbers to error message format strings.
   private static final Map<Integer, String> errorMessages;
@@ -472,6 +475,9 @@ public final class ErrorMessages {
     // Image errors
     errorMessages.put(ERROR_IMAGE_CANNOT_ROTATE,
         "The version of Android on this device does not support image rotation.");
+    // Aerogear Push errors
+    errorMessages.put(ERROR_AEROGEARPUSH_EXCEPTION,
+        "The version of Android on this device does not support the Aerogear Component.");
   }
 
   private ErrorMessages() {

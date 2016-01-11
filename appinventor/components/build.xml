@@ -138,6 +138,7 @@
         <pathelement location="${lib.dir}/json/json.jar" />
         <pathelement location="${lib.dir}/aerogear/aerogear-android-push-2.2.2.jar" />
         <pathelement location="${lib.dir}/aerogear/aerogear-android-core-2.1.0.jar" />
+        <pathelement location="${lib.dir}/aerogear/aerogear-android-pipe-2.1.0.jar" />
         <pathelement location="${lib.dir}/playservices/stripped-play-services-6.1.11.jar" />
       </classpath>
     </ai.javac5>
@@ -244,6 +245,7 @@
           <pathelement location="${lib.dir}/guava/guava-14.0.1.jar" />
           <pathelement location="${lib.dir}/aerogear/aerogear-android-push-2.2.2.jar" />
           <pathelement location="${lib.dir}/aerogear/aerogear-android-core-2.1.0.jar" />
+          <pathelement location="${lib.dir}/aerogear/aerogear-android-pipe-2.1.0.jar" />
           <pathelement location="${lib.dir}/playservices/stripped-play-services-6.1.11.jar" />
         </classpath>
         <compilerarg line="-processorpath ${local.build.dir}/AnnotationProcessors.jar"/>

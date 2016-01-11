@@ -11,6 +11,7 @@ import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
 
+import com.google.appinventor.components.runtime.util.ErrorMessages;
 import org.jboss.aerogear.android.unifiedpush.RegistrarManager;
 import org.jboss.aerogear.android.unifiedpush.gcm.AeroGearGCMPushJsonConfiguration;
 import org.jboss.aerogear.android.core.Callback;
@@ -23,7 +24,8 @@ import org.jboss.aerogear.android.core.Callback;
 @SimpleObject
 @UsesPermissions(permissionNames = "android.permission.INTERNET, android.permission.GET_ACCOUNTS," +
     "android.permission.WAKE_LOCK, com.google.android.c2dm.permission.RECEIVE")
-@UsesLibraries(libraries = "aerogear-android-push.jar, aerogear-android-core.jar, stripped-play-services.jar")
+@UsesLibraries(libraries = "aerogear-android-push.jar, aerogear-android-core.jar, " +
+    "aerogear-android-pipe.jar, gson-2.1.jar, stripped-play-services.jar")
 public final class AerogearPush extends AndroidNonvisibleComponent {
 
   private static final String PUSH_REGISTRAR_NAME = "myPushRegistrar";
@@ -42,28 +44,36 @@ public final class AerogearPush extends AndroidNonvisibleComponent {
     super(container.$form());
 
     //TODO (jos) This component only works with API 16+ : make the appropriate checks.
-    RegistrarManager.config(PUSH_REGISTRAR_NAME, AeroGearGCMPushJsonConfiguration.class)
-        .loadConfigJson(container.$context()) //TODO (jos) right now it is not finding the json file in assets
-        .asRegistrar();
 
-    RegistrarManager.getRegistrar(PUSH_REGISTRAR_NAME).register(container.$context().getApplicationContext(),
-        new Callback<Void>() {
-      @Override
-      public void onSuccess(Void data) {
-        Log.d(TAG, "Registration Succeeded");
-        Log.d(TAG, "Registration Succeeded");
-        Log.d(TAG, "Registration Succeeded");
-//        Toast.makeText(getApplicationContext(), "Yay, Device registered", Toast.LENGTH_LONG).show();
-      }
+    try {
+      //TODO (jos) Major issue here: the json file is only found when building the app, not in the Companion
+      RegistrarManager.config(PUSH_REGISTRAR_NAME, AeroGearGCMPushJsonConfiguration.class)
+          .loadConfigJson(container.$context())
+          .asRegistrar();
 
-      @Override
-      public void onFailure(Exception e) {
-        Log.e(TAG, e.getMessage(), e);
-        Log.e(TAG, e.getMessage(), e);
-        Log.e(TAG, e.getMessage(), e);
-//        Toast.makeText(getApplicationContext(), "Ops, something is wrong :(", Toast.LENGTH_LONG).show();
-      }
-    });
+      RegistrarManager.getRegistrar(PUSH_REGISTRAR_NAME)
+          .register(container.$context().getApplicationContext(),
+              new Callback<Void>() {
+                @Override
+                public void onSuccess(Void data) {
+                  Log.d(TAG, "Registration Succeeded");
+                  //TODO (jos) redirect message to UI
+                  //Toast.makeText(getApplicationContext(),
+                  //    "Yay, Device registered", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                  Log.e(TAG, e.getMessage(), e);
+                  form.dispatchErrorOccurredEvent(AerogearPush.this, "AerogearPush",
+                      ErrorMessages.ERROR_AEROGEARPUSH_EXCEPTION, e.getMessage());
+                }
+          });
+    } catch (Exception e) {
+      e.printStackTrace();
+      form.dispatchErrorOccurredEvent(AerogearPush.this, "AerogearPush",
+          ErrorMessages.ERROR_AEROGEARPUSH_EXCEPTION, e.getMessage());
+    }
   }
 
   /**
