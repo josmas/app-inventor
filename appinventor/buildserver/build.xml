@@ -82,6 +82,9 @@
     <copy toFile="${classes.files.dir}/json.jar" file="${lib.dir}/json/json.jar" />
     <copy toFile="${classes.files.dir}/google-oauth-client-beta.jar" file="${lib.dir}/oauth/google-oauth-client-1.10.1-beta.jar" />
     <copy toFile="${classes.files.dir}/guava-14.0.1.jar" file="${lib.dir}/guava/guava-14.0.1.jar" />
+    <copy toFile="${classes.files.dir}/aerogear-android-push.jar" file="${lib.dir}/aerogear/aerogear-android-push-2.2.2.jar" />
+    <copy toFile="${classes.files.dir}/aerogear-android-core.jar" file="${lib.dir}/aerogear/aerogear-android-core-2.1.0.jar" />
+    <copy toFile="${classes.files.dir}/stripped-play-services.jar" file="${lib.dir}/playservices/stripped-play-services-6.1.11.jar" />
     <copy toFile="${classes.files.dir}/core.jar" file="${lib.dir}/QRGenerator/core.jar" />
     <copy toFile="${classes.files.dir}/android.jar" file="${lib.dir}/android/4.2.2/android.jar" />
     <copy toFile="${classes.files.dir}/dx.jar" file="${lib.dir}/android/tools/dx.jar" />
