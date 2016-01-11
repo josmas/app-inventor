@@ -68,6 +68,7 @@ public final class Compiler {
 
   // Copied from SdkLevel.java (which isn't in our class path so we duplicate it here)
   private static final String LEVEL_GINGERBREAD_MR1 = "10";
+  private static final String LEVEL_JELLY_BEAN = "16";
 
   public static final String RUNTIME_FILES_DIR = "/files/";
 
@@ -358,14 +359,26 @@ public final class Compiler {
           out.write("  <uses-feature android:name=\"android.hardware.wifi\" />\n"); // We actually require wifi
       }
 
+
+      for (String permission : permissionsNeeded) {
+        out.write("  <uses-permission android:name=\"" + permission + "\" />\n");
+      }
+
       // Firebase requires at least API 10 (Gingerbread MR1)
       if (componentTypes.contains("FirebaseDB") && !isForCompanion) {
         minSDK = LEVEL_GINGERBREAD_MR1;
       }
 
-      for (String permission : permissionsNeeded) {
-        out.write("  <uses-permission android:name=\"" + permission + "\" />\n");
+      // Aerogear Push requires at least API 16 (JELLY_BEAN)
+      if (componentTypes.contains("AerogearPush") && !isForCompanion) {
+
+        minSDK = LEVEL_JELLY_BEAN;
+
+        //Some additional permission needed for Aerogear
+        out.write("  <permission android:name=\"" + packageName + ".permission.C2D_MESSAGE\" android:protectionLevel=\"signature\" />\n");
+        out.write("  <uses-permission android:name=\"" + ".permission.C2D_MESSAGE\" />\n");
       }
+
 
       // The market will use the following to filter apps shown to devices that don't support
       // the specified SDK version.  We right now support building for minSDK 4,
@@ -491,6 +504,22 @@ public final class Compiler {
             "android:permission=\"com.google.android.apps.googlevoice.permission.RECEIVE_SMS\" /> \n" +
             "</intent-filter>  \n" +
         "</receiver> \n");
+      }
+
+      if (componentTypes.contains("AerogearPush")) {
+        System.out.println("Android manifest: including <receiver> tag for Aerogear component");
+        out.write(
+             "  <receiver\n" +
+             "    android:name=\"org.jboss.aerogear.android.unifiedpush.gcm.AeroGearGCMMessageReceiver\"\n" +
+             "    android:permission=\"com.google.android.c2dm.permission.SEND\">\n" +
+             "    <intent-filter>\n" +
+             "      <action android:name=\"com.google.android.c2dm.intent.RECEIVE\"/>\n" +
+             "      <action android:name=\"com.google.android.c2dm.intent.REGISTRATION\"/>\n" +
+             "\n" +
+             "      <category android:name=\"org.jboss.aerogear.unifiedpush.helloworld\"/>\n" +
+             "    </intent-filter>\n" +
+             "    <meta-data android:name=\"DEFAULT_MESSAGE_HANDLER_KEY\" android:value=\"com.google.appinventor.components.runtime.AerogearPushNotifyingHandler\"/>\n" +
+             "  </receiver>\n");
       }
 
       out.write("  </application>\n");
