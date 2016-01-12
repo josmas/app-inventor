@@ -32,39 +32,28 @@ public class AerogearPushNotifyingHandler implements MessageHandler {
   }
 
   private void notify(String message) {
-    NotificationManager mNotificationManager = (NotificationManager)
-        context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-    String classname = context.getPackageName() + ".Screen1";
-    Intent intent = null;
+    Class<?> forName;
     try {
-      intent = new Intent(context, Class.forName(classname))
-          .addFlags(PendingIntent.FLAG_UPDATE_CURRENT)
-          .putExtra(UnifiedPushMessage.ALERT_KEY, message);
+      forName = Class.forName(context.getPackageName() + ".Screen1");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
-      //TODO (jos) handle the exception properly
+      // Not much we can do here? We could Toast but the Activity might not be up. Log and exit.
+      Log.e(TAG, "Could not find the class " + context.getPackageName() + ".Screen1: Exiting Notification.");
+      return;
     }
+    Intent intent = new Intent(context, forName)
+        .addFlags(PendingIntent.FLAG_UPDATE_CURRENT)
+        .putExtra(UnifiedPushMessage.ALERT_KEY, message);
 
-    intent.setAction(Intent.ACTION_MAIN);
-    intent.addCategory(Intent.CATEGORY_LAUNCHER);
-
-    // These flags seem to work, but maybe there's a way to improve on this?
-    // NEW_TASK: the activity will become a new task on activity stack
-    // SINGLE_TOP: activity won't be launched if already on top of stack
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-    // Create the Notification
     NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    Notification note = new Notification(R.drawable.sym_call_incoming, " : the message goes here somehow ", System.currentTimeMillis());
+    Notification note = new Notification(R.drawable.stat_notify_voicemail, message, System.currentTimeMillis());
     note.flags |= Notification.FLAG_AUTO_CANCEL;
     note.defaults |= Notification.DEFAULT_SOUND;
 
-    PendingIntent activity = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    note.setLatestEventInfo(context, "Sms from ????", "the message here", activity);
-    note.number = Texting.getCachedMsgCount();
-    nm.notify(null, NOTIFICATION_ID, note);
-    Log.i(TAG, "Notification sent, classname: " + classname);
+    PendingIntent pendingActivity = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    note.setLatestEventInfo(context, "Notification from AeroGear", message, pendingActivity);
+    nm.notify(NOTIFICATION_ID, note);
   }
 
   @Override
