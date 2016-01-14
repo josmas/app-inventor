@@ -15,7 +15,7 @@ import org.jboss.aerogear.android.unifiedpush.gcm.UnifiedPushMessage;
 public class AerogearPushNotifyingHandler implements MessageHandler {
 
   private static final String TAG = "AerogearPush";
-  public static final int NOTIFICATION_ID = 8648; // Following from SmsBroadcastReceiver
+  public static final int NOTIFICATION_ID = 8648; // Following from SmsBroadcastReceiver.java
   private Context context;
 
   public static final AerogearPushNotifyingHandler instance = new AerogearPushNotifyingHandler();
@@ -54,6 +54,9 @@ public class AerogearPushNotifyingHandler implements MessageHandler {
     PendingIntent pendingActivity = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     note.setLatestEventInfo(context, "Notification from AeroGear", message, pendingActivity);
     nm.notify(NOTIFICATION_ID, note);
+
+    // Send the message to the component for caching.
+    AerogearPush.cacheReceivedMessage(message);
   }
 
   @Override

@@ -4246,6 +4246,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String GyroscopeChangedEvents();
 
+  @DefaultMessage("NotificationReceived")
+  @Description("")
+  String NotificationReceivedEvents();
+
   //Methods
   @DefaultMessage("ResolveActivity")
   @Description("")

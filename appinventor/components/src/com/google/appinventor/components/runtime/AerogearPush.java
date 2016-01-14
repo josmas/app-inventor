@@ -5,6 +5,8 @@
 
 package com.google.appinventor.components.runtime;
 
+import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ComponentCategory;
@@ -12,10 +14,18 @@ import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
 
 import com.google.appinventor.components.runtime.util.ErrorMessages;
+import com.google.appinventor.components.runtime.util.OnInitializeListener;
+import org.jboss.aerogear.android.unifiedpush.MessageHandler;
 import org.jboss.aerogear.android.unifiedpush.RegistrarManager;
 import org.jboss.aerogear.android.unifiedpush.gcm.AeroGearGCMPushJsonConfiguration;
 import org.jboss.aerogear.android.core.Callback;
+import org.jboss.aerogear.android.unifiedpush.gcm.UnifiedPushMessage;
 
+/**
+ * Main class for the Aerogear Push notifications component. This component also relies on
+ * AerogearPushNotificationHandler to create a notification instead of passing a message directly
+ * if the Screen is not active at the moment of receiving the message.
+ */
 @DesignerComponent(version = YaVersion.AEROGEARPUSH_COMPONENT_VERSION,
     description = "A new component ",
     category = ComponentCategory.EXPERIMENTAL,
@@ -26,7 +36,8 @@ import org.jboss.aerogear.android.core.Callback;
     "android.permission.WAKE_LOCK, com.google.android.c2dm.permission.RECEIVE")
 @UsesLibraries(libraries = "aerogear-android-push.jar, aerogear-android-core.jar, " +
     "aerogear-android-pipe.jar, gson-2.1.jar, stripped-play-services.jar")
-public final class AerogearPush extends AndroidNonvisibleComponent {
+public final class AerogearPush extends AndroidNonvisibleComponent
+    implements MessageHandler, OnResumeListener, OnPauseListener, Component {
 
   private static final String PUSH_REGISTRAR_NAME = "myPushRegistrar";
   private static final String TAG = "AerogearPush";
@@ -74,6 +85,10 @@ public final class AerogearPush extends AndroidNonvisibleComponent {
       form.dispatchErrorOccurredEvent(AerogearPush.this, "AerogearPush",
           ErrorMessages.ERROR_AEROGEARPUSH_EXCEPTION, e.getMessage());
     }
+
+    // Register this component for lifecycle callbacks
+    container.$form().registerForOnResume(this);
+    container.$form().registerForOnPause(this);
   }
 
   /**
@@ -118,5 +133,62 @@ public final class AerogearPush extends AndroidNonvisibleComponent {
     this.consumerSecret = consumerSecret;
   }
 
+  /**
+   * This method is called by AerogearPushNotifyingHandler when a notification is received.
+   * @param message
+   */
+  public static void cacheReceivedMessage(String message) {
+    Log.d(TAG, "Got a message" + message);
+    Log.d(TAG, "Got a message and I will cache it");
+    //TODO (jos) think about how I want to cache this message.
+    // Make a stack that will automatically pop all elements and will also delete last when #= 20
+  }
 
+  /**
+   * Event that's raised when a notification message is received by the phone.
+   * This only applies when the Actvity is showing. Otherwise the message will be sent as a notification
+   * and stored in a cache of received messages.
+   *
+   * @param messageText the text of the message.
+   */
+  @SimpleEvent
+  public void NotificationReceived(String messageText) {
+    Log.i(TAG, "NotificationReceived :" + messageText);
+    if (EventDispatcher.dispatchEvent(this, "NotificationReceived", messageText)) {
+      Log.i(TAG, "Dispatch successful to UI");
+    } else {
+      Log.i(TAG, "Dispatch failed to UI");
+    }
+  }
+
+  @Override
+  public void onResume() {
+    Log.i(TAG, "onResume()");
+    RegistrarManager.registerMainThreadHandler(this); // 1
+    RegistrarManager.unregisterBackgroundThreadHandler(AerogearPushNotifyingHandler.instance);
+  }
+
+  @Override
+  public void onPause() {
+    Log.i(TAG, "onPause()");
+    RegistrarManager.unregisterMainThreadHandler(this); // 2
+    RegistrarManager.registerBackgroundThreadHandler(AerogearPushNotifyingHandler.instance);
+
+  }
+
+  @Override
+  public void onDeleteMessage(Context context, Bundle bundle) {
+    //TODO (jos) do Something about this
+  }
+
+  @Override
+  public void onMessage(Context context, Bundle bundle) {
+    Log.i(TAG, "onMessage in AerogearPush component");
+    NotificationReceived(bundle.getString(UnifiedPushMessage.ALERT_KEY));
+  }
+
+  @Override
+  public void onError() {
+    //TODO (jos) do Something about this
+  }
 }
