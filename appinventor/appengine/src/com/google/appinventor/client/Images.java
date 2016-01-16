@@ -514,4 +514,11 @@ public interface Images extends Resources {
   @Source("com/google/appinventor/images/proximitysensor.png")
   ImageResource proximitysensor();
 
+  /**
+   * Designer palette item: MQTT
+   */
+  @Source("com/google/appinventor/images/mqtt.png")
+  ImageResource mqtt();
+
+
 }
