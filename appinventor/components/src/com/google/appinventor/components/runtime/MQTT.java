@@ -5,16 +5,10 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.DesignerComponent;
-import com.google.appinventor.components.annotations.PropertyCategory;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleObject;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import android.util.Log;
+import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ComponentCategory;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
-import com.google.appinventor.components.runtime.errors.YailRuntimeError;
 
 
 import android.view.View;
@@ -25,7 +19,12 @@ import android.view.View;
     nonVisible = true,
     iconName = "images/mqtt.png")
 @SimpleObject
+@UsesPermissions(permissionNames = "android.permission.INTERNET, android.permission.WAKE_LOCK," +
+    "android.permission.ACCESS_NETWORK_STATE")
+@UsesLibraries(libraries = "paho-service.jar, paho-client.jar, android-support-v4.jar, android-support-v7-appcompat.jar")
 public final class MQTT extends AndroidNonvisibleComponent {
+
+  public static final String TAG = "MQTT";
 
   /**
    * Creates a new component.
@@ -34,6 +33,11 @@ public final class MQTT extends AndroidNonvisibleComponent {
    */
   public MQTT(ComponentContainer container) {
     super(container.$form());
+    Log.d(TAG, "MQTT: call on component constructor");
+    MQTTConnection conn = new MQTTConnection(container.$context());
+    Log.d(TAG, "MQTT: after creating the connection");
+    conn.connectMqtt();
+    Log.d(TAG, "MQTT: after having called connectMqtt()");
   }
 
 }

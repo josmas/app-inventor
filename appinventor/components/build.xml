@@ -128,6 +128,10 @@
         <pathelement location="${lib.dir}/apache-http/httpmime-4.3.4.jar" />
         <pathelement location="${lib.dir}/fusiontables/fusiontables.jar" />
         <pathelement location="${lib.dir}/firebase/firebase-client-android-2.5.0.jar" />
+        <pathelement location="${lib.dir}/android-support/android-support-v4.jar" />
+        <pathelement location="${lib.dir}/android-support/android-support-v7-appcompat.jar" />
+        <pathelement location="${lib.dir}/mqtt/org.eclipse.paho.android.service-1.0.2.jar" />
+        <pathelement location="${lib.dir}/mqtt/org.eclipse.paho.client.mqttv3-1.0.3-20160118.051413-321.jar" />
         <pathelement location="${lib.dir}/oauth/google-api-client-1.10.3-beta.jar" />
         <pathelement location="${lib.dir}/oauth/google-api-client-android2-1.10.3-beta.jar" />
         <pathelement location="${lib.dir}/oauth/google-http-client-1.10.3-beta.jar" />
@@ -232,6 +236,10 @@
           <pathelement location="${lib.dir}/apache-http/httpmime-4.3.4.jar" />
           <pathelement location="${lib.dir}/fusiontables/fusiontables.jar" />
           <pathelement location="${lib.dir}/firebase/firebase-client-android-2.5.0.jar" />
+          <pathelement location="${lib.dir}/android-support/android-support-v4.jar" />
+          <pathelement location="${lib.dir}/android-support/android-support-v7-appcompat.jar" />
+          <pathelement location="${lib.dir}/mqtt/org.eclipse.paho.android.service-1.0.2.jar" />
+          <pathelement location="${lib.dir}/mqtt/org.eclipse.paho.client.mqttv3-1.0.3-20160118.051413-321.jar" />
           <pathelement location="${lib.dir}/oauth/google-api-client-1.10.3-beta.jar" />
           <pathelement location="${lib.dir}/oauth/google-api-client-android2-1.10.3-beta.jar" />
           <pathelement location="${lib.dir}/oauth/google-http-client-1.10.3-beta.jar" />

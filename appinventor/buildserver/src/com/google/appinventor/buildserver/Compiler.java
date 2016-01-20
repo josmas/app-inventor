@@ -395,6 +395,10 @@ public final class Compiler {
       }
       out.write(">\n");
 
+      if (componentTypes.contains("MQTT")){
+        out.write("<service android:name=\"org.eclipse.paho.android.service.MqttService\" ></service>\n");
+      }
+
       for (Project.SourceDescriptor source : project.getSources()) {
         String formClassName = source.getQualifiedName();
         // String screenName = formClassName.substring(formClassName.lastIndexOf('.') + 1);

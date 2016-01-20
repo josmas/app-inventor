@@ -108,6 +108,10 @@
         <pathelement location="lib/tablelayout/TableLayout-jdk1.5-2007-04-21.jar" />
         <pathelement location="lib/twitter/twitter4j-core-3.0.5.jar" />
         <pathelement location="lib/twitter/twitter4j-media-support-3.0.5.jar" />
+        <pathelement location="lib/android-support/android-support-v4.jar" />
+        <pathelement location="lib/android-support/android-support-v7-appcompat.jar" />
+        <pathelement location="lib/mqtt/org.eclipse.paho.android.service-1.0.2.jar" />
+        <pathelement location="lib/mqtt/org.eclipse.paho.client.mqttv3-1.0.3-20160118.051413-321.jar" />
         <pathelement location="lib/QRGenerator/core.jar" />
         <pathelement location="lib/QRGenerator/javase.jar" />
         <fileset dir="buildserver/lib" includes="**/*.jar"/>
