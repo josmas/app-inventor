@@ -70,7 +70,6 @@ import com.google.appinventor.shared.rpc.user.User;
 import com.google.appinventor.shared.rpc.user.UserInfoService;
 import com.google.appinventor.shared.rpc.user.UserInfoServiceAsync;
 import com.google.appinventor.shared.settings.SettingsConstants;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -1318,7 +1317,6 @@ public class Ode implements EntryPoint {
    * @return  true if the locale ISO strings are equal modulo case or if both
    *          are empty, otherwise false
    */
-  @VisibleForTesting
   static boolean compareLocales(String oldLocale, String newLocale, String defaultValue) {
     if ((oldLocale == null || oldLocale.isEmpty()) && (newLocale == null || newLocale.isEmpty())) {
       return true;

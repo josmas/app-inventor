@@ -39,7 +39,6 @@ public final class DragSourceSupport implements MouseListener, TouchStartHandler
    * Used as a testing seam.
    *
    */
-  // @VisibleForTesting
   static interface IDom {
     public void setCapture(Element elem);
     public void releaseCapture(Element elem);
@@ -99,7 +98,6 @@ public final class DragSourceSupport implements MouseListener, TouchStartHandler
    * Number of pixels away from the click-point that a drag-source must be
    * dragged to initiate a drag action.
    */
-  // @VisibleForTesting
   static final int DRAG_THRESHOLD = 5;
 
   // Provider of the drag widget and the set of permissible drop targets
@@ -142,7 +140,6 @@ public final class DragSourceSupport implements MouseListener, TouchStartHandler
     this(dragSource, RealDom.INSTANCE);
   }
 
-  // @VisibleForTesting
   DragSourceSupport(DragSource dragSource, IDom dom) {
     this.dragSource = dragSource;
     this.dom = dom;
