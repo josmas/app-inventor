@@ -12,7 +12,7 @@ import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.editor.youngandroid.BlocklyPanel;
 import com.google.appinventor.common.version.GitBuildId;
 import com.google.appinventor.shared.rpc.user.Config;
-import com.google.common.base.Strings;
+import com.google.appinventor.client.utils.Strings;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;

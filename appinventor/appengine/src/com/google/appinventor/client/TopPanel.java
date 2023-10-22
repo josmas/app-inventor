@@ -20,7 +20,7 @@ import com.google.appinventor.client.widgets.TextButton;
 
 import com.google.appinventor.shared.rpc.user.Config;
 
-import com.google.common.base.Strings;
+import com.google.appinventor.client.utils.Strings;
 import com.google.common.collect.Lists;
 
 import com.google.gwt.core.client.GWT;

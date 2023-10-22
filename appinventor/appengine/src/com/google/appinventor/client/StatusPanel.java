@@ -8,7 +8,7 @@ package com.google.appinventor.client;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
-import com.google.common.base.Strings;
+import com.google.appinventor.client.utils.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiFactory;

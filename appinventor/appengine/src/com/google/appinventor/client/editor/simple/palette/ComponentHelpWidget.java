@@ -9,7 +9,7 @@ package com.google.appinventor.client.editor.simple.palette;
 import com.google.appinventor.client.ComponentsTranslation;
 import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.utils.PZAwarePositionCallback;
-import com.google.common.base.Strings;
+import com.google.appinventor.client.utils.Strings;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.resources.client.ImageResource;
