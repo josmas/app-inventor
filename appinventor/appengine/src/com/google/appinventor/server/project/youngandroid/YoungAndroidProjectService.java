@@ -52,11 +52,8 @@ import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidSource
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidYailNode;
 import com.google.appinventor.shared.rpc.user.User;
 import com.google.appinventor.shared.settings.Settings;
-import com.google.appinventor.shared.settings.SettingsConstants;
 import com.google.appinventor.shared.storage.StorageUtil;
 import com.google.appinventor.shared.youngandroid.YoungAndroidSourceAnalyzer;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import java.util.Locale;
@@ -152,7 +149,6 @@ public final class YoungAndroidProjectService extends CommonProjectService {
    * @param qualifiedName the qualified name of the form.
    * @return the contents of a new Young Android form file.
    */
-  @VisibleForTesting
   public static String getInitialFormPropertiesFileContents(String qualifiedName) {
     final int lastDotPos = qualifiedName.lastIndexOf('.');
     String packageName = qualifiedName.split("\\.")[2];

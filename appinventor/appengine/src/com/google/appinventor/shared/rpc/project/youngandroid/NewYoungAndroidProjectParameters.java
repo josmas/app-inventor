@@ -6,7 +6,6 @@
 
 package com.google.appinventor.shared.rpc.project.youngandroid;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.appinventor.shared.rpc.project.NewProjectParameters;
 
 /**
@@ -16,7 +15,7 @@ import com.google.appinventor.shared.rpc.project.NewProjectParameters;
  *      String, com.google.appinventor.shared.rpc.project.NewProjectParameters)
  */
 public final class NewYoungAndroidProjectParameters implements NewProjectParameters {
-  @VisibleForTesting public static final String YOUNG_ANDROID_FORM_NAME = "Screen1";
+  public static final String YOUNG_ANDROID_FORM_NAME = "Screen1";
 
   // Package name of the main form
   private String packageName;

@@ -19,7 +19,6 @@ import com.google.appinventor.shared.rpc.project.TextFile;
 import com.google.appinventor.shared.rpc.project.UserProject;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidProjectNode;
 import com.google.appinventor.shared.storage.StorageUtil;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -157,7 +156,6 @@ public final class FileImporterImpl implements FileImporter {
     return storageIo.getUserProject(userId, projectId);
   }
 
-  @VisibleForTesting
   public long importFile(String userId, long projectId, String fileName,
       InputStream uploadedFileStream) throws FileImporterException, IOException {
     int maxAssetSizeBytes = (int) (maxAssetSizeMegs.get() * 1024 * 1024);

@@ -17,8 +17,6 @@ import com.google.appinventor.server.storage.StorageIoInstanceHolder;
 import com.google.appinventor.shared.rpc.ServerLayout;
 import com.google.appinventor.shared.rpc.user.User;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -61,7 +59,6 @@ public class OdeAuthFilter implements Filter {
   // Whether this server should use a whitelist to determine who can
   // access it. Value is specified in the <system-properties> section
   // of appengine-web.xml.
-  @VisibleForTesting
   static final Flag<Boolean> useWhitelist = Flag.createFlag("use.whitelist", false);
   static final Flag<String> sessionKeyFile = Flag.createFlag("session.keyfile", "WEB-INF/authkey");
   static final Flag<Integer> idleTimeout = Flag.createFlag("session.idletimeout", 120);
@@ -133,7 +130,6 @@ public class OdeAuthFilter implements Filter {
     doMyFilter(userInfo, isAdmin, isReadOnly, httpRequest, httpResponse, chain);
   }
 
-  @VisibleForTesting
   void doMyFilter(UserInfo userInfo, boolean isAdmin, boolean isReadOnly,
     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
     throws IOException, ServletException {
@@ -191,13 +187,11 @@ public class OdeAuthFilter implements Filter {
     }
   }
 
-  @VisibleForTesting
   boolean isUserWhitelisted() {
     //return whitelist.isInWhitelist(localUser);
     return storageIo.checkWhiteList(localUser.getUserEmail());
   }
 
-  @VisibleForTesting
   void writeWhitelistErrorMessage(HttpServletResponse response) throws IOException {
     response.setContentType("text/plain; charset=utf-8");
     PrintWriter out = response.getWriter();
@@ -231,7 +225,6 @@ public class OdeAuthFilter implements Filter {
    * <p>This method is called from {@link WebStartFileServlet}, a non-filtered
    * servlet.
    */
-  @VisibleForTesting
   void removeUser() {
     localUser.set(null);
   }
