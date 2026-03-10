@@ -481,6 +481,10 @@ public class LoadComponentInfo implements CommonTask {
 
         if (!infoSet.isEmpty()) {
           infoMap.put(type, infoSet);
+        } else if (context.getExtCompTypes().contains(type)) {
+          // Ext comp's own build info says no separate libs needed (already baked into dex).
+          // Remove any stale entry added from simple_components_build_info.json for this type.
+          infoMap.remove(type);
         }
 
         processConditionalInfo(compJson, type, targetInfo);

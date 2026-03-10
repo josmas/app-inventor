@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -28,6 +29,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 @BuildType(aab = true, apk = true)
 public class RunD8 extends DexTask implements AndroidTask {
@@ -69,14 +74,25 @@ public class RunD8 extends DexTask implements AndroidTask {
         inputs.add(preDexLibrary(context, new File(lib)));
       }
 
-      // Add extension libraries
+      // Add extension libraries. For in-tree extensions whose own classes are already present in
+      // the main AndroidRuntime.jar, add a filtered jar that strips those duplicate classes but
+      // keeps any library classes (e.g. executorch, fbjni) not present in the main runtime.
       Set<String> addedExtJars = new HashSet<>();
       for (String type : context.getExtCompTypes()) {
         String sourcePath = ExecutorUtils.getExtCompDirPath(type, context.getProject(),
             context.getExtTypePathCache())
             + context.getResources().getSimpleAndroidRuntimeJarPath();
         if (!addedExtJars.contains(sourcePath)) {
-          inputs.add(new File(sourcePath));
+          String mainRuntimeJar = context.getResources().getSimpleAndroidRuntimeJar();
+          if (extClassesInMainRuntime(type, mainRuntimeJar)) {
+            File filtered = filteredExtJar(new File(sourcePath), mainRuntimeJar,
+                context.getPaths().getTmpDir());
+            if (filtered != null && filtered.length() > 0) {
+              inputs.add(filtered);
+            }
+          } else {
+            inputs.add(new File(sourcePath));
+          }
           addedExtJars.add(sourcePath);
         }
       }
@@ -141,6 +157,61 @@ public class RunD8 extends DexTask implements AndroidTask {
       return TaskResult.generateSuccess();
     } catch (IOException e) {
       return TaskResult.generateError(e);
+    }
+  }
+
+  /**
+   * Returns true if the main AndroidRuntime.jar already contains the ext comp's main class
+   * (indicating the extension was compiled in-tree and its classes are in the main dex).
+   */
+  private static boolean extClassesInMainRuntime(String type, String mainRuntimeJar) {
+    String classEntry = type.replace('.', '/') + ".class";
+    try (ZipFile zip = new ZipFile(mainRuntimeJar)) {
+      return zip.getEntry(classEntry) != null;
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  /**
+   * Returns a copy of {@code extJar} with any entries that are already present in
+   * {@code mainRuntimeJar} removed. This allows in-tree extension library dependencies
+   * (e.g. executorch, fbjni) to be dexed without re-dexing the extension's own classes.
+   */
+  private static File filteredExtJar(File extJar, String mainRuntimeJar, File tmpDir) {
+    try {
+      Set<String> mainEntries = new HashSet<>();
+      try (ZipFile mainZip = new ZipFile(mainRuntimeJar)) {
+        Enumeration<? extends ZipEntry> entries = mainZip.entries();
+        while (entries.hasMoreElements()) {
+          mainEntries.add(entries.nextElement().getName());
+        }
+      }
+      File filtered = File.createTempFile("filtered_ext_", ".jar", tmpDir);
+      filtered.deleteOnExit();
+      try (ZipFile extZip = new ZipFile(extJar);
+           ZipOutputStream out = new ZipOutputStream(new FileOutputStream(filtered))) {
+        Enumeration<? extends ZipEntry> entries = extZip.entries();
+        while (entries.hasMoreElements()) {
+          ZipEntry entry = entries.nextElement();
+          if (!mainEntries.contains(entry.getName())) {
+            out.putNextEntry(new ZipEntry(entry.getName()));
+            if (!entry.isDirectory()) {
+              try (InputStream in = extZip.getInputStream(entry)) {
+                byte[] buf = new byte[4096];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                  out.write(buf, 0, len);
+                }
+              }
+            }
+            out.closeEntry();
+          }
+        }
+      }
+      return filtered;
+    } catch (IOException e) {
+      return null;
     }
   }
 

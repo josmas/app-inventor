@@ -5,7 +5,6 @@
 
 package com.google.appinventor.buildserver.tasks.android;
 
-import static com.google.appinventor.buildserver.YoungAndroidConstants.EXT_COMPS_DIR_NAME;
 import static com.google.appinventor.components.common.ComponentDescriptorConstants.ARM64_V8A_SUFFIX;
 import static com.google.appinventor.components.common.ComponentDescriptorConstants.ARMEABI_V7A_SUFFIX;
 import static com.google.appinventor.components.common.ComponentDescriptorConstants.X86_64_SUFFIX;
@@ -79,8 +78,8 @@ public class AttachNativeLibs implements AndroidTask {
           } else if (context.getExtCompTypes().contains(type)) {
             sourcePath = ExecutorUtils.getExtCompDirPath(type, context.getProject(),
                 context.getExtTypePathCache()) + pathSuffix;
-            targetDir = ExecutorUtils.createDir(targetDir, EXT_COMPS_DIR_NAME);
-            targetDir = ExecutorUtils.createDir(targetDir, type);
+            // targetDir intentionally NOT modified: ext comp .so files go directly into
+            // arm64-v8a/ (or armeabi-v7a/ etc.) so Android's PackageInstaller auto-extracts them.
           } else {
             context.getReporter().error(
                 "There was an unexpected error while processing native code", true);
