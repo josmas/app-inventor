@@ -1,11 +1,11 @@
 // -*- mode: java; c-basic-offset: 2; -*-
-// Copyright 2025 MIT, All rights reserved
+// Copyright 2026 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
-// http://www.apache.org/licenses/LICENSE-2.0
 
 package edu.mit.appinventor.tinyllavademo;
 
-import android.Manifest;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.google.appinventor.components.annotations.DesignerComponent;
@@ -15,6 +15,9 @@ import com.google.appinventor.components.annotations.SimpleEvent;
 import com.google.appinventor.components.annotations.SimpleFunction;
 import com.google.appinventor.components.annotations.SimpleObject;
 import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.annotations.UsesAssets;
+import com.google.appinventor.components.annotations.UsesLibraries;
+import com.google.appinventor.components.annotations.UsesNativeLibraries;
 import com.google.appinventor.components.annotations.UsesPermissions;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
@@ -38,6 +41,9 @@ import com.google.appinventor.components.runtime.util.AsynchUtil;
     nonVisible = true,
     iconName = "images/extension.png")
 @SimpleObject(external = true)
+@UsesLibraries(libraries = "executorch-android.jar, fbjni.jar, nativeloader.jar")
+@UsesNativeLibraries(v8aLibraries = "libexecutorch.so, libfbjni.so, libc++_shared.so")
+@UsesAssets(fileNames = "vocab.json, merges.txt, connector.pte")
 @UsesPermissions(permissionNames =
     "android.permission.READ_EXTERNAL_STORAGE," +
     "android.permission.READ_MEDIA_IMAGES")
@@ -50,6 +56,7 @@ public class TinyLlavaDemo extends AndroidNonvisibleComponent {
   private String modelDirectory = DEFAULT_MODEL_DIR;
   private int maxTokens = DEFAULT_MAX_TOKENS;
   private boolean isReady = false;
+  private TinyLlavaModule module = null;
 
   public TinyLlavaDemo(ComponentContainer container) {
     super(container.$form());
@@ -97,8 +104,8 @@ public class TinyLlavaDemo extends AndroidNonvisibleComponent {
       @Override
       public void run() {
         try {
-          // Stage 1 stub: simulate load delay
-          Thread.sleep(100);
+          module = new TinyLlavaModule(form, TinyLlavaDemo.this);
+          module.load(modelDirectory);
           isReady = true;
           form.runOnUiThread(new Runnable() {
             @Override
@@ -137,21 +144,28 @@ public class TinyLlavaDemo extends AndroidNonvisibleComponent {
       @Override
       public void run() {
         try {
-          // TODO: for now emit a single stub token and a stub response
-          final String stubToken = "stub";
-          final String stubResponse = "stub response";
-
-          form.runOnUiThread(new Runnable() {
+          Bitmap bmp = BitmapFactory.decodeFile(imagePath);
+          if (bmp == null) {
+            throw new Exception("Cannot decode image: " + imagePath);
+          }
+          final StringBuilder full = new StringBuilder();
+          module.generate(bmp, prompt, maxTokens, new TinyLlavaModule.TokenCallback() {
             @Override
-            public void run() {
-              GotToken(stubToken);
+            public void onToken(final String token) {
+              full.append(token);
+              form.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                  GotToken(token);
+                }
+              });
             }
           });
-
+          final String result = full.toString();
           form.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              GotResponse(stubResponse);
+              GotResponse(result);
             }
           });
         } catch (Exception e) {

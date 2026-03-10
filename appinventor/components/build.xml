@@ -185,9 +185,19 @@
     <copy toFile="${public.deps.dir}/android.jar" file="${android.lib}" />
     <copy toFile="${public.deps.dir}/CommonVersion.jar" file="${build.dir}/common/CommonVersion.jar" />
 
-    <!-- Add extension libraries here -->
-    <!-- Example: <copy toFile="${public.deps.dir}/my-dependency.jar" file="${lib.dir}/my-dependency/my-dependency-1.0.0.jar" /> -->
-    <!-- Remember to include my-dependency.jar in the @UsesLibraries annotation in the extension -->
+    <!-- ExecuTorch for TinyLlavaDemo extension -->
+    <copy toFile="${public.deps.dir}/executorch-android.jar"
+          file="${lib.dir}/executorch/executorch-android.jar" />
+    <copy toFile="${public.deps.dir}/fbjni.jar"
+          file="${lib.dir}/executorch/fbjni.jar" />
+    <copy toFile="${public.deps.dir}/nativeloader.jar"
+          file="${lib.dir}/executorch/nativeloader.jar" />
+    <copy toFile="${public.deps.dir}/arm64-v8a/libexecutorch.so"
+          file="${lib.dir}/executorch/arm64-v8a/libexecutorch.so" />
+    <copy toFile="${public.deps.dir}/arm64-v8a/libfbjni.so"
+          file="${lib.dir}/executorch/arm64-v8a/libfbjni.so" />
+    <copy toFile="${public.deps.dir}/arm64-v8a/libc++_shared.so"
+          file="${lib.dir}/executorch/arm64-v8a/libc++_shared.so" />
   </target>
 
   <path id="AndroidRuntime.path">
@@ -531,6 +541,15 @@
 
   <target name="extensions" depends="ExternalComponentGenerator, jarAllExtensions, dexAllExtensions">
     <mkdir dir="${Extensions.dir}" />
+    <!-- Copy native .so files into each extension's files/<arch>/ directory so they
+         are packaged inside the .aix and available to the buildserver. -->
+    <mkdir dir="${ExternalComponent.dir}/edu.mit.appinventor.tinyllavademo/files/arm64-v8a" />
+    <copy toFile="${ExternalComponent.dir}/edu.mit.appinventor.tinyllavademo/files/arm64-v8a/libexecutorch.so"
+          file="${lib.dir}/executorch/arm64-v8a/libexecutorch.so" />
+    <copy toFile="${ExternalComponent.dir}/edu.mit.appinventor.tinyllavademo/files/arm64-v8a/libfbjni.so"
+          file="${lib.dir}/executorch/arm64-v8a/libfbjni.so" />
+    <copy toFile="${ExternalComponent.dir}/edu.mit.appinventor.tinyllavademo/files/arm64-v8a/libc++_shared.so"
+          file="${lib.dir}/executorch/arm64-v8a/libc++_shared.so" />
     <foreach target="packExtension" param="extension" inheritall="true">
       <path>
         <dirset dir="${ExternalComponent.dir}">
