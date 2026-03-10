@@ -8,6 +8,7 @@ package com.google.appinventor.buildserver.tasks.common;
 import com.google.appinventor.buildserver.interfaces.BuildType;
 import com.google.appinventor.buildserver.Compiler;
 import com.google.appinventor.buildserver.TaskResult;
+import com.google.appinventor.buildserver.YoungAndroidConstants;
 import com.google.appinventor.buildserver.context.CompilerContext;
 import com.google.appinventor.buildserver.interfaces.CommonTask;
 import com.google.appinventor.buildserver.util.ExecutorUtils;
@@ -79,10 +80,34 @@ public class ReadBuildInfo implements CommonTask {
 
       HashSet<String> simpleCompTypes = Sets.newHashSet(context.getCompTypes());
       simpleCompTypes.retainAll(allSimpleTypes);
-      context.setSimpleCompTypes(simpleCompTypes);
 
       HashSet<String> extCompTypes = Sets.newHashSet(context.getCompTypes());
       extCompTypes.removeAll(allSimpleTypes);
+
+      // If a component type has a directory under external_comps/ in the project, treat it
+      // as an extension regardless of whether it also appears in simple_components_build_info.json.
+      // This handles extensions developed and compiled in the same repository as the built-in
+      // components, which would otherwise be misclassified as simple (built-in) components.
+      File extCompsDir = new File(context.getProject().getAssetsDirectory(),
+          YoungAndroidConstants.EXT_COMPS_DIR_NAME);
+      if (extCompsDir.isDirectory()) {
+        File[] extDirs = extCompsDir.listFiles();
+        if (extDirs != null) {
+          for (File extDir : extDirs) {
+            if (extDir.isDirectory()) {
+              String pkg = extDir.getName();
+              for (String type : new HashSet<>(simpleCompTypes)) {
+                if (type.equals(pkg) || type.startsWith(pkg + ".")) {
+                  simpleCompTypes.remove(type);
+                  extCompTypes.add(type);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      context.setSimpleCompTypes(simpleCompTypes);
       context.setExtCompTypes(extCompTypes);
     } catch (JSONException e) {
       e.printStackTrace();

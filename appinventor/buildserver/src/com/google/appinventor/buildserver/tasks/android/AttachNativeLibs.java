@@ -76,7 +76,7 @@ public class AttachNativeLibs implements AndroidTask {
 
           if (context.getSimpleCompTypes().contains(type)) {
             sourcePath = context.getResource(pathSuffix);
-          } else if (context.getExt().contains(type)) {
+          } else if (context.getExtCompTypes().contains(type)) {
             sourcePath = ExecutorUtils.getExtCompDirPath(type, context.getProject(),
                 context.getExtTypePathCache()) + pathSuffix;
             targetDir = ExecutorUtils.createDir(targetDir, EXT_COMPS_DIR_NAME);
