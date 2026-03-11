@@ -6,7 +6,10 @@ package edu.mit.appinventor.tinyllavademo;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
+
+import java.io.InputStream;
 
 import com.google.appinventor.components.annotations.DesignerComponent;
 import com.google.appinventor.components.annotations.DesignerProperty;
@@ -144,7 +147,14 @@ public class TinyLlavaDemo extends AndroidNonvisibleComponent {
       @Override
       public void run() {
         try {
-          Bitmap bmp = BitmapFactory.decodeFile(imagePath);
+          Bitmap bmp;
+          if (imagePath.startsWith("content://") || imagePath.startsWith("file://")) {
+            InputStream is = form.getContentResolver().openInputStream(Uri.parse(imagePath));
+            bmp = BitmapFactory.decodeStream(is);
+            if (is != null) is.close();
+          } else {
+            bmp = BitmapFactory.decodeFile(imagePath);
+          }
           if (bmp == null) {
             throw new Exception("Cannot decode image: " + imagePath);
           }

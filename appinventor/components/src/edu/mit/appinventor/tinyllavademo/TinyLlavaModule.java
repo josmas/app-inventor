@@ -64,6 +64,7 @@ class TinyLlavaModule {
   private Module llmPrefill;
   private Module llmTextPrefill;
   private Module llmDecode;
+  private Module lmHead;
   private EmbedLookup embedLookup;
   private BpeTokenizer tokenizer;
 
@@ -88,6 +89,7 @@ class TinyLlavaModule {
     llmPrefill     = Module.load(modelDirectory + "llm_prefill.pte");
     llmTextPrefill = Module.load(modelDirectory + "llm_text_prefill.pte");
     llmDecode      = Module.load(modelDirectory + "llm_decode.pte");
+    lmHead         = Module.load(modelDirectory + "lm_head.pte");
     embedLookup    = new EmbedLookup(modelDirectory + "embed_weights.bin");
 
     isLoaded = true;
@@ -160,13 +162,18 @@ class TinyLlavaModule {
       EValue[] prefillOut = llmPrefill.forward(
           EValue.from(embedsTensor), EValue.from(attnTensor), EValue.from(posTensor));
 
-      float[] logits = prefillOut[0].toTensor().getDataAsFloatArray();
+      float[] hiddenStates = prefillOut[0].toTensor().getDataAsFloatArray();
       kCacheArr = prefillOut[1].toTensor().getDataAsFloatArray();
       vCacheArr = prefillOut[2].toTensor().getDataAsFloatArray();
 
       saveImageKVCache(kCacheArr, vCacheArr);
       lastBitmap = bitmap;
 
+      float[] lastHidden = new float[HIDDEN];
+      System.arraycopy(hiddenStates, (validLen - 1) * HIDDEN, lastHidden, 0, HIDDEN);
+      float[] logits = lmHead.forward(
+          EValue.from(Tensor.fromBlob(lastHidden, new long[]{1, HIDDEN})))[0]
+          .toTensor().getDataAsFloatArray();
       firstId  = argmax(logits);
       cachePos = validLen;
 
@@ -215,12 +222,17 @@ class TinyLlavaModule {
           EValue.from(maskTensor),
           EValue.from(posIdsTensor));
 
-      float[] logits = textPrefillOut[0].toTensor().getDataAsFloatArray();
+      float[] hidden = textPrefillOut[0].toTensor().getDataAsFloatArray();
       float[] newK   = textPrefillOut[1].toTensor().getDataAsFloatArray();
       float[] newV   = textPrefillOut[2].toTensor().getDataAsFloatArray();
 
       writeTextKVToCache(newK, newV, kCacheArr, vCacheArr);
 
+      float[] lastHidden = new float[HIDDEN];
+      System.arraycopy(hidden, (N - 1) * HIDDEN, lastHidden, 0, HIDDEN);
+      float[] logits = lmHead.forward(
+          EValue.from(Tensor.fromBlob(lastHidden, new long[]{1, HIDDEN})))[0]
+          .toTensor().getDataAsFloatArray();
       firstId  = argmax(logits);
       cachePos = N_IMAGE + N;
     }
@@ -257,9 +269,12 @@ class TinyLlavaModule {
           EValue.from(maskTensor),
           EValue.from(posIdTensor));
 
-      float[] logits = decodeOut[0].toTensor().getDataAsFloatArray();
-      float[] newK   = decodeOut[1].toTensor().getDataAsFloatArray();
-      float[] newV   = decodeOut[2].toTensor().getDataAsFloatArray();
+      float[] newHidden = decodeOut[0].toTensor().getDataAsFloatArray();
+      float[] newK      = decodeOut[1].toTensor().getDataAsFloatArray();
+      float[] newV      = decodeOut[2].toTensor().getDataAsFloatArray();
+      float[] logits = lmHead.forward(
+          EValue.from(Tensor.fromBlob(newHidden, new long[]{1, HIDDEN})))[0]
+          .toTensor().getDataAsFloatArray();
 
       for (int layer = 0; layer < NUM_LAYERS; layer++) {
         for (int h = 0; h < NUM_KV_HEADS; h++) {
