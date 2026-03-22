@@ -666,6 +666,10 @@ public interface OdeMessages extends Messages, ComponentTranslations {
   @Description("Message providing details about starting a USB connection.")
   String usbMenuItem();
 
+  @DefaultMessage("Connect (Local)")
+  @Description("Menu item for connecting to companion on local network via ADB. Only shown when the server is running locally.")
+  String localNetworkMenuItem();
+
   @DefaultMessage("Reset Connection (Alt + Shift + R)")
   @Description("Reset all connections.")
   String resetConnectionsMenuItem();

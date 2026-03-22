@@ -243,6 +243,12 @@ public final class YaBlocksEditor extends BlocksEditor<YoungAndroidBlocksNode, Y
     blocksArea.startRepl(alreadyRunning, forChromebook, forEmulator, forUsb);
   }
 
+  @Override
+  public void startLocalRepl(boolean alreadyRunning) {
+    blocksArea.setActiveFormWorkspace();
+    blocksArea.startLocalRepl(alreadyRunning);
+  }
+
   /*
    * Perform a Hard Reset of the Emulator
    */

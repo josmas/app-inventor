@@ -1157,14 +1157,14 @@ Blockly.ReplMgr.setDoitResult = function(block, value) {
     block.getIcon(Blockly.icons.CommentIcon.TYPE).setBubbleVisible(true);
 };
 
-Blockly.ReplMgr.startAdbDevice = function(rs, usb, loopback) {
+Blockly.ReplMgr.startAdbDevice = function(rs, usb, loopback, onDeviceFound, deviceOverride) {
     var first = true;
     var context = this;
     var counter = 0;            // Used to for counting down
     var ubercounter = 0;        // Used to keep track of how many times we
                                 // have attempted to start the emulator
     var ubergiveup = 8;         // How many attempts to start the emulator
-    var pc = 0;                 // Use to keep track of state
+    var pc = deviceOverride ? 1 : 0;  // Skip polling if device already known
     var dialog = null;          // We have one dialog for the block
                                 // so we don't create multiple ones
     var udialog = null;         // Dialog to tell the user to plug phone in
@@ -1236,6 +1236,7 @@ Blockly.ReplMgr.startAdbDevice = function(rs, usb, loopback) {
                     if (result.status == "OK") { // We're running!
                         device = result.device;    // the device we are going to talk to
                         console.log("ReplMgr: set device = " + device);
+                        if (onDeviceFound) onDeviceFound(device);
                         pc = 1;                    // Next State
                         if (usb) {
                             counter = 6;               // Wait five seconds for usb
@@ -1351,6 +1352,11 @@ Blockly.ReplMgr.startAdbDevice = function(rs, usb, loopback) {
             });
         }
     };
+    if (deviceOverride) {
+        device = deviceOverride;
+        counter = 0;    // Device already confirmed available — call /replstart/ immediately
+        if (onDeviceFound) onDeviceFound(device);
+    }
     interval = setInterval(mainloop, 1000); // Once per second
 };
 
@@ -1450,6 +1456,90 @@ Blockly.ReplMgr.startRepl = function(already, chromebook, emulator, usb, loopbac
         top.ReplState.state = this.rsState.IDLE;
         this.hardreset(this.formName);       // Tell aiStarter to kill off adb
     }
+};
+
+Blockly.ReplMgr.startLocalRepl = async function() {
+    var rs = top.ReplState;
+    var me = this;
+
+    if (rs.state !== this.rsState.IDLE) return;
+
+    // Check aiStarter is reachable before proceeding
+    var available = await new Promise(function(resolve) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'http://localhost:8004/ping/', true);
+        xhr.timeout = 500;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) resolve(xhr.status == 200);
+        };
+        xhr.ontimeout = function() { resolve(false); };
+        xhr.onerror  = function() { resolve(false); };
+        xhr.send();
+    });
+
+    if (!available) {
+        var d = new Blockly.Util.Dialog(
+            Blockly.Msg.REPL_CONNECTION_FAILURE1,
+            'aiStarter is not running. Please start aiStarter and try again.',
+            Blockly.Msg.REPL_OK, false, null, 0,
+            function() { d.hide(); });
+        return;
+    }
+
+    // Try /devices/ endpoint (patched aiStarter) — handles mDNS and all ADB device formats.
+    // Falls back to /ucheck/ polling (startAdbDevice) for older aiStarter builds.
+    var devicesResult = await new Promise(function(resolve) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'http://localhost:8004/devices/', true);
+        xhr.timeout = 1000;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    try { resolve(JSON.parse(xhr.responseText)); }
+                    catch(e) { resolve(null); }
+                } else {
+                    resolve(null);
+                }
+            }
+        };
+        xhr.ontimeout = function() { resolve(null); };
+        xhr.onerror   = function() { resolve(null); };
+        xhr.send();
+    });
+
+    // Set up shared rs state
+    rs.didversioncheck = false;
+    rs.isUSB = true;
+    rs.hasfetchassets = false;
+    if (rs.phoneState) rs.phoneState.initialized = false;
+    rs.replcode  = 'emulator';
+    rs.seq_count = 1;
+    rs.count     = 0;
+
+    // Default URLs via ADB port forwarding; overridden below for classic ip:port devices
+    rs.url          = 'http://127.0.0.1:8001/_newblocks';
+    rs.rurl         = 'http://127.0.0.1:8001/_values';
+    rs.versionurl   = 'http://127.0.0.1:8001/_getversion';
+    rs.baseurl      = 'http://127.0.0.1:8001/';
+    rs.extensionurl = 'http://127.0.0.1:8001/_extensions';
+
+    if (devicesResult && devicesResult.devices) {
+        if (devicesResult.devices.length === 0) {
+            var d = new Blockly.Util.Dialog(
+                Blockly.Msg.REPL_HELPER_Q,
+                'No Android device found. Connect a device via USB or enable WiFi debugging.',
+                Blockly.Msg.REPL_OK, false, null, 0,
+                function() { d.hide(); });
+            return;
+        }
+        // Patched aiStarter: pass device directly, skip /ucheck/ polling
+        // counter=0 ensures /replstart/ fires immediately while daemon is still live
+        this.startAdbDevice(rs, true, false, null, devicesResult.devices[0]);
+    } else {
+        // Old aiStarter: fall back to /ucheck/ polling
+        this.startAdbDevice(rs, true, false, null);
+    }
+    rs.state = this.rsState.WAITING;
 };
 
 Blockly.ReplMgr.genCode = function() {

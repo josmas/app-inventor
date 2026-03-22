@@ -77,6 +77,9 @@
       <ai:DropDownItem name="Wireless" caption="{messages.AICompanionMenuItem}">
         <yaactions:WirelessAction/>
       </ai:DropDownItem>
+      <ai:DropDownItem name="LocalNetwork" caption="{messages.localNetworkMenuItem}">
+        <yaactions:LocalNetworkAction/>
+      </ai:DropDownItem>
       <ai:DropDownItem name="Emulator" caption="{messages.emulatorMenuItem}"
                        dependentStyleName="needsAiStarter">
         <yaactions:EmulatorAction/>

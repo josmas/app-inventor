@@ -158,6 +158,9 @@ public abstract class FileEditor extends Composite {
   public void startRepl(boolean alreadyRunning, boolean forChromebook, boolean forEmulator, boolean forUsb) {
   }
 
+  public void startLocalRepl(boolean alreadyRunning) {
+  }
+
   /**
    * Gets the raw content of the file associated with the editor.
    * This method is used when the EditorManager saves modified files.

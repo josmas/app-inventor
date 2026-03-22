@@ -18,6 +18,7 @@ import com.google.appinventor.client.widgets.DropDownButton;
 import com.google.appinventor.common.version.AppInventorFeatures;
 import com.google.appinventor.shared.storage.StorageUtil;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
@@ -50,6 +51,7 @@ public class TopToolbar extends Composite {
   private static final String WIDGET_NAME_BUILD_YAIL = "Yail";
   private static final String WIDGET_NAME_CONNECT_TO = "ConnectTo";
   private static final String WIDGET_NAME_WIRELESS_BUTTON = "Wireless";
+  private static final String WIDGET_NAME_LOCALNETWORK_BUTTON = "LocalNetwork";
   private static final String WIDGET_NAME_CHROMEBOOK = "Chromebook";
   private static final String WIDGET_NAME_EMULATOR_BUTTON = "Emulator";
   private static final String WIDGET_NAME_USB_BUTTON = "Usb";
@@ -173,6 +175,9 @@ public class TopToolbar extends Composite {
     if (!Ode.getInstance().getUser().getIsAdmin()) {
       adminDropDown.removeFromParent();
     }
+
+    // Only show "Connect (Local)" when running on a local/private network server
+    connectDropDown.setItemVisibleById(WIDGET_NAME_LOCALNETWORK_BUTTON, isLocalServer());
   }
 
   @UiFactory
@@ -223,6 +228,7 @@ public class TopToolbar extends Composite {
       boolean isUsbRunning) {
     if (!isEmulatorRunning && !isCompanionRunning && !isUsbRunning) {
       connectDropDown.setItemEnabled(MESSAGES.AICompanionMenuItem(), true);
+      connectDropDown.setItemEnabledById(WIDGET_NAME_LOCALNETWORK_BUTTON, true);
       if (iamChromebook) {
         connectDropDown.setItemEnabled(MESSAGES.chromebookMenuItem(), true);
       } else {
@@ -233,6 +239,7 @@ public class TopToolbar extends Composite {
       connectDropDown.setItemEnabled(MESSAGES.saveProjectToCompanionMenuItem(), false);
     } else {
       connectDropDown.setItemEnabled(MESSAGES.AICompanionMenuItem(), false);
+      connectDropDown.setItemEnabledById(WIDGET_NAME_LOCALNETWORK_BUTTON, false);
       if (iamChromebook) {
         connectDropDown.setItemEnabled(MESSAGES.chromebookMenuItem(), false);
       } else {
@@ -281,6 +288,37 @@ public class TopToolbar extends Composite {
       } else {                  // We are connecting via wifi to a Companion
         updateConnectToDropDownButton(false, true, false);
       }
+    } else {
+      updateConnectToDropDownButton(false, false, false);
+    }
+  }
+
+  /** Returns true when App Inventor is running on a loopback or private-network address. */
+  private static boolean isLocalServer() {
+    String host = Window.Location.getHostName();
+    return host.equals("localhost") || host.equals("127.0.0.1")
+        || host.startsWith("192.168.") || host.startsWith("10.")
+        || host.matches("172\\.(1[6-9]|2[0-9]|3[01])\\..*");
+  }
+
+  /**
+   * startLocalRepl -- Start/Stop a local ADB-based connection to the companion.
+   * Only available when App Inventor is running on a local server. Uses the same
+   * ADB mechanism as USB mode but under a separate menu item.
+   *
+   * @param start -- true to start the repl, false to stop it.
+   */
+  public void startLocalRepl(boolean start) {
+    DesignProject currentProject = Ode.getInstance().getDesignToolbar().getCurrentProject();
+    if (currentProject == null) {
+      LOG.warning("DesignToolbar.currentProject is null. "
+          + "Ignoring attempt to start the local repl.");
+      return;
+    }
+    Screen screen = currentProject.screens.get(currentProject.currentScreen);
+    screen.blocksEditor.startLocalRepl(!start);
+    if (start) {
+      updateConnectToDropDownButton(false, true, false);
     } else {
       updateConnectToDropDownButton(false, false, false);
     }
