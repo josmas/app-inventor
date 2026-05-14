@@ -5,10 +5,18 @@
 
 import Foundation
 
+let TYPE_FIELD = "\u{0002}$type$\u{0003}"
+
 // let numberRegex = NSRegularExpression(pattern: "-?[1-9]?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?")
 public func getJsonRepresentation(_ object: AnyObject?) throws -> String {
   guard let object = object else {
     return "null"
+  }
+  if let matrix = object as? YailMatrix {
+    let dict: NSDictionary = [TYPE_FIELD as NSString: "YailMatrix" as NSString,
+                              "data" as NSString: matrix.toDataArray()]
+    let jsonData = try JSONSerialization.data(withJSONObject: dict)
+    return String(data: jsonData, encoding: .utf8)!
   }
   let wrappedObject = [object]
   guard JSONSerialization.isValidJSONObject(wrappedObject) else {
@@ -82,6 +90,12 @@ fileprivate func convertJsonItem(_ item: AnyObject?, _ useDicts: Bool) -> AnyObj
   if item == nil || item is NSNull {
     return "null" as AnyObject
   } else if let jsonObject = item as? NSDictionary {
+    if let typeValue = jsonObject[TYPE_FIELD as NSString] as? String,
+       typeValue == "YailMatrix",
+       let dataArray = jsonObject["data"] as? NSArray,
+       let matrix = try? YailMatrix.fromJsonArray(dataArray) {
+      return matrix
+    }
     if useDicts {
       return getDictFromJsonObject(jsonObject) as AnyObject
     } else {
