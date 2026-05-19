@@ -35,7 +35,7 @@ public func getObjectFromJson(_ json: String?) throws -> AnyObject? {
     return "" as NSString
   }
   // NSJSONSerialization can only parse arrays and objects at the top level, so we wrap value here
-  let jsonArray = "[\(jsonString)]"
+  let jsonArray = "[\(jsonString)]".replace(target: "\u{02}", withString: "\\u0002").replace(target: "\u{03}", withString: "\\u0003")
   let result = try JSONSerialization.jsonObject(with: jsonArray.data(using: .utf8)!,
                                                 options: JSONSerialization.ReadingOptions.mutableContainers)
   if let array = result as? Array<AnyObject> {
