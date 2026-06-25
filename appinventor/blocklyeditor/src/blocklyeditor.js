@@ -1028,8 +1028,6 @@ Blockly.BlocklyEditor['create'] = function(container, formName, readOnly, rtl) {
     'grid': {'spacing': '20', 'length': '5', 'snap': false, 'colour': '#ccc'},
     'zoom': {'controls': true, 'wheel': true, 'scaleSpeed': 1.1, 'maxScale': 3, 'minScale': 0.1},
     plugins: {
-      blockDragger: ScrollBlockDragger,
-      metricsManager: ScrollMetricsManager,
       connectionPreviewer: decoratePreviewer(Blockly.InsertionMarkerPreviewer),
       [Blockly.registry.Type.CONNECTION_CHECKER]: 'CustomizableConnectionChecker',
     },
@@ -1045,15 +1043,6 @@ Blockly.BlocklyEditor['create'] = function(container, formName, readOnly, rtl) {
   lexicalVariablesPlugin.init(workspace);
   var searchPlugin = new WorkspaceSearch(workspace);
   searchPlugin.init();
-  const scrollOptions = new ScrollOptions(workspace);
-  // Make autoscrolling be based purely on the mouse position ands slow it down a bit.
-  scrollOptions.init({
-    edgeScrollOptions: {
-      oversizeBlockMargin: 0,
-      oversizeBlockThreshold: 0,
-      slowBlockSpeed: .15
-    }
-  });
   Blockly.allWorkspaces[formName] = workspace;
   workspace.formName = formName;
   workspace.screenList_ = [];
