@@ -951,6 +951,44 @@ AI.Blockly.ContextMenuItems.registerAll = function() {
 AI.Blockly.ContextMenuItems.registerAll();
 
 Blockly.BlocklyEditor['cssRegistered'] = false;
+Blockly.BlocklyEditor['keyboardShortcutsRegistered'] = false;
+
+Blockly.BlocklyEditor['remapKeyboardShortcut'] = function(shortcutName, keyCodes) {
+  var registry = Blockly.ShortcutRegistry.registry;
+  if (!registry.getKeyCodesByShortcutName(shortcutName).length) {
+    return;
+  }
+  var serializedKey = registry.createSerializedKey(
+      keyCodes[keyCodes.length - 1], keyCodes.slice(0, -1));
+  registry.removeAllKeyMappings(shortcutName);
+  registry.addKeyMapping(serializedKey, shortcutName, true);
+};
+
+Blockly.BlocklyEditor['registerKeyboardShortcuts'] = function() {
+  if (Blockly.BlocklyEditor['keyboardShortcutsRegistered']) {
+    return;
+  }
+  Blockly.BlocklyEditor['keyboardShortcutsRegistered'] = true;
+
+  var keyCodes = Blockly.utils.KeyCodes;
+  var shortcutNames = Blockly.ShortcutItems.names;
+  Blockly.BlocklyEditor['remapKeyboardShortcut'](
+      shortcutNames.FOCUS_TOOLBOX, [keyCodes.ALT, keyCodes.T]);
+  Blockly.BlocklyEditor['remapKeyboardShortcut'](
+      shortcutNames.CLEANUP, [keyCodes.ALT, keyCodes.C]);
+  Blockly.BlocklyEditor['remapKeyboardShortcut'](
+      shortcutNames.DISCONNECT, [keyCodes.ALT, keyCodes.X]);
+  Blockly.BlocklyEditor['remapKeyboardShortcut'](
+      shortcutNames.START_MOVE, [keyCodes.ALT, keyCodes.M]);
+  Blockly.BlocklyEditor['remapKeyboardShortcut'](
+      shortcutNames.DUPLICATE, [keyCodes.ALT, keyCodes.SHIFT, keyCodes.D]);
+  Blockly.BlocklyEditor['remapKeyboardShortcut'](
+      shortcutNames.NEXT_STACK, [keyCodes.ALT, keyCodes.N]);
+  Blockly.BlocklyEditor['remapKeyboardShortcut'](
+      shortcutNames.PREVIOUS_STACK, [keyCodes.ALT, keyCodes.B]);
+  Blockly.BlocklyEditor['remapKeyboardShortcut'](
+      shortcutNames.FOCUS_WORKSPACE, [keyCodes.ALT, keyCodes.W]);
+};
 
 /**
  * Create a new Blockly workspace but without initializing its DOM.
@@ -969,11 +1007,11 @@ Blockly.BlocklyEditor['create'] = function(container, formName, readOnly, rtl) {
 .blocklyZoom>image, .blocklyZoom>image:hover { opacity: 1.0; }
 .blocklyTrash { opacity: 1.0 !important; }
 `);
-      KeyboardNavigation.registerKeyboardNavigationStyles();
     } catch (e) {
       // Thrown if we've already registered the CSS. This should only happen in unit tests.
     }
   }
+  Blockly.BlocklyEditor['registerKeyboardShortcuts']();
   var options = {
     'toolbox': {
       'kind': 'flyoutToolbox',
@@ -1016,9 +1054,6 @@ Blockly.BlocklyEditor['create'] = function(container, formName, readOnly, rtl) {
       slowBlockSpeed: .15
     }
   });
-  if (!AI.Blockly.keyboardNavigation) {
-    AI.Blockly.keyboardNavigation = new KeyboardNavigation(workspace);
-  }
   Blockly.allWorkspaces[formName] = workspace;
   workspace.formName = formName;
   workspace.screenList_ = [];
