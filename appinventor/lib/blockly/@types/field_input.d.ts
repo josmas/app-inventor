@@ -21,7 +21,7 @@ type InputTypes = string | number;
 /**
  * Abstract class for an editable input field.
  *
- * @typeParam T - The value stored on the field.
+ * @template T - The value stored on the field.
  * @internal
  */
 export declare abstract class FieldInput<T extends InputTypes> extends Field<string | T> {
@@ -263,6 +263,29 @@ export declare abstract class FieldInput<T extends InputTypes> extends Field<str
      * @returns The value to store.
      */
     protected getValueFromEditorText_(text: string): any;
+    /**
+     * Gets an ARIA-friendly label representation of this field's type.
+     *
+     * Implementations are responsible for, and encouraged to, return a localized
+     * version of the ARIA representation of the field's type.
+     *
+     * @returns An ARIA representation of the field's type or a default if it is
+     *     unspecified.
+     */
+    getAriaTypeName(): string | null;
+    /**
+     * Gets an ARIA-friendly label representation of this field's value.
+     *
+     * Implementations are responsible for, and encouraged to, return a localized
+     * version of the ARIA representation of the field's value.
+     *
+     * @returns An ARIA representation of the field's text.
+     */
+    getAriaValue(): string | null;
+    /**
+     * Customizes the label for this field to include "editable" if it applies.
+     */
+    recomputeAriaContext(): boolean;
 }
 /**
  * Config options for the input field.

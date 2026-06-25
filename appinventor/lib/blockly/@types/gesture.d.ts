@@ -150,18 +150,6 @@ export declare class Gesture {
      */
     private updateDragDelta;
     /**
-     * Update this gesture to record whether a block is being dragged from the
-     * flyout.
-     * This function should be called on a pointermove event the first time
-     * the drag radius is exceeded.  It should be called no more than once per
-     * gesture. If a block should be dragged from the flyout this function creates
-     * the new block on the main workspace and updates targetBlock_ and
-     * startWorkspace_.
-     *
-     * @returns True if a block is being dragged from the flyout.
-     */
-    private updateIsDraggingFromFlyout;
-    /**
      * Check whether to start a workspace drag. If a workspace is being dragged,
      * create the necessary WorkspaceDragger and start the drag.
      *

@@ -29,11 +29,8 @@ import { type IFocusableNode } from './interfaces/i_focusable_node.js';
 import type { IFocusableTree } from './interfaces/i_focusable_tree.js';
 import type { IMetricsManager } from './interfaces/i_metrics_manager.js';
 import type { IToolbox } from './interfaces/i_toolbox.js';
-import type { LineCursor } from './keyboard_nav/line_cursor.js';
-import type { Marker } from './keyboard_nav/marker.js';
+import { Navigator } from './keyboard_nav/navigators/navigator.js';
 import { LayerManager } from './layer_manager.js';
-import { MarkerManager } from './marker_manager.js';
-import { Navigator } from './navigator.js';
 import { Options } from './options.js';
 import type { Renderer } from './renderers/common/renderer.js';
 import type { ScrollbarPair } from './scrollbar_pair.js';
@@ -220,7 +217,6 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
     private readonly highlightedBlocks;
     private audioManager;
     private grid;
-    private markerManager;
     /**
      * Map from function names to callbacks, for deciding what to do when a
      * custom toolbox category is opened.
@@ -235,10 +231,6 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
     private readonly renderer;
     /** Cached parent SVG. */
     private cachedParentSvg;
-    /** True if keyboard accessibility mode is on, false otherwise. */
-    keyboardAccessibilityMode: boolean;
-    /** True iff a keyboard-initiated move ("drag") is in progress. */
-    keyboardMoveInProgress: boolean;
     /** The list of top-level bounded elements on the workspace. */
     private topBoundedElements;
     /** The recorded drag targets. */
@@ -251,20 +243,27 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
     svgBubbleCanvas_: SVGElement;
     zoomControls_: ZoomControls | null;
     /**
+     * Focus ring in the workspace.
+     */
+    private workspaceFocusRing;
+    /**
+     * Selection ring inside the workspace.
+     */
+    private workspaceSelectionRing;
+    /**
      * Navigator that handles moving focus between items in this workspace in
      * response to keyboard navigation commands.
      */
     private navigator;
     /**
+     * Whether this workspace has ever been focused. Used to announce usage hints
+     * to screenreaders on initial focus only.
+     */
+    private static everFocused;
+    /**
      * @param options Dictionary of options.
      */
     constructor(options: Options);
-    /**
-     * Get the marker manager for this workspace.
-     *
-     * @returns The marker manager.
-     */
-    getMarkerManager(): MarkerManager;
     /**
      * Gets the metrics manager for this workspace.
      *
@@ -284,21 +283,6 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
      * @returns The component manager.
      */
     getComponentManager(): ComponentManager;
-    /**
-     * Get the marker with the given ID.
-     *
-     * @param id The ID of the marker.
-     * @returns The marker with the given ID or null if no marker with the given
-     *     ID exists.
-     * @internal
-     */
-    getMarker(id: string): Marker | null;
-    /**
-     * The cursor for this workspace.
-     *
-     * @returns The cursor for the workspace.
-     */
-    getCursor(): LineCursor;
     /**
      * Get the block renderer attached to this workspace.
      *
@@ -407,6 +391,14 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
      */
     setResizeHandlerWrapper(handler: browserEvents.Data): void;
     /**
+     * Sets Aria labels, roles, etc. for the workspace depending on the type of workspace it is.
+     */
+    setInitialAriaContext(): void;
+    /**
+     * Updates the label on the workspace to reflect the number of top-level stacks in the workspace.
+     */
+    private updateAriaLabel;
+    /**
      * Create the workspace DOM elements.
      *
      * @param opt_backgroundClass Either 'blocklyMainBackground' or
@@ -487,6 +479,14 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
      * trash, zoom, toolbox, etc. (e.g. window resize).
      */
     resize(): void;
+    /**
+     * Sizes the given focus/selection ring inside the bounds of the workspace.
+     *
+     * @param ring The interior workspace ring indicator to resize.
+     * @param inset How many pixels in from the bounds of the workspace the ring
+     *     should be positioned.
+     */
+    private resizeWorkspaceRing;
     /**
      * Resizes and repositions workspace chrome if the page has a new
      * scroll position.
@@ -608,11 +608,11 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
     /**
      * Returns the drag target the pointer event is over.
      *
-     * @param e Pointer move event.
+     * @param e Pointer move event or a workspace coordinate.
      * @returns Null if not over a drag target, or the drag target the event is
      *     over.
      */
-    getDragTarget(e: PointerEvent): IDragTarget | null;
+    getDragTarget(e: PointerEvent | Coordinate): IDragTarget | null;
     /**
      * Handle a pointerdown on SVG drawing surface.
      *
@@ -633,24 +633,6 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
      * @returns New location of object.
      */
     moveDrag(e: PointerEvent): Coordinate;
-    /**
-     * Indicate whether a keyboard move is in progress or not.
-     *
-     * Should be called with true when a keyboard move of an IDraggable
-     * is starts, and false when it finishes or is aborted.
-     *
-     * N.B.: This method is experimental and internal-only.  It is
-     * intended only to called only from the keyboard navigation plugin.
-     * Its signature and behaviour may be modified, or the method
-     * removed, at an time without notice and without being treated
-     * as a breaking change.
-     *
-     * TODO(#8960): Delete this.
-     *
-     * @internal
-     * @param inProgress Is a keyboard-initated move in progress?
-     */
-    setKeyboardMoveInProgress(inProgress: boolean): void;
     /**
      * Returns true iff the user is currently engaged in a drag gesture,
      * or if a keyboard-initated move is in progress.
@@ -1077,6 +1059,11 @@ export declare class WorkspaceSvg extends Workspace implements IContextMenu, IFo
     onTreeFocus(_node: IFocusableNode, _previousTree: IFocusableTree | null): void;
     /** See IFocusableTree.onTreeBlur. */
     onTreeBlur(nextTree: IFocusableTree | null): void;
+    /**
+     * Handles the user acting on this workspace via keyboard navigation by
+     * prompting them to use the arrow keys (instead of Enter) to navigate.
+     */
+    performAction(): void;
     /**
      * Returns an object responsible for coordinating movement of focus between
      * items on this workspace in response to keyboard navigation commands.

@@ -3,11 +3,6 @@
  * Copyright 2016 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
-/**
- * Components for creating connections between blocks.
- *
- * @class
- */
 import type { BlockSvg } from './block_svg.js';
 import { Connection } from './connection.js';
 import { IContextMenu } from './interfaces/i_contextmenu.js';
@@ -133,6 +128,12 @@ export declare class RenderedConnection extends Connection implements IContextMe
         connection: RenderedConnection | null;
         radius: number;
     };
+    /**
+     * Sets the aria role, label, and other state for this connection.
+     *
+     * @param highlightSvg The focusable element for this connection.
+     */
+    private recomputeAriaContext;
     /** Add highlighting around this connection. */
     highlight(): void;
     /** Remove the highlighting around this connection. */

@@ -9,10 +9,42 @@
  * @class
  */
 import './events/events_click.js';
+import { IFocusableNode } from './interfaces/i_focusable_node.js';
 import type { IPositionable } from './interfaces/i_positionable.js';
 import type { UiMetrics } from './metrics_manager.js';
 import { Rect } from './utils/rect.js';
 import type { WorkspaceSvg } from './workspace_svg.js';
+/**
+ * Base class for an individual zoom control (in, out, reset).
+ *
+ * @internal
+ */
+declare abstract class ZoomControl implements IFocusableNode {
+    protected workspace: WorkspaceSvg;
+    protected group: SVGGElement;
+    private pointerDownHandler;
+    private id;
+    constructor(workspace: WorkspaceSvg, group: SVGGElement);
+    getId(): string;
+    /**
+     * Handles a mouse down event on the zoom in or zoom out buttons on the
+     *    workspace.
+     *
+     * @param amount Amount of zooming. Negative amount values zoom out, and
+     *     positive amount values zoom in.
+     * @param e A mouse down or keydown event.
+     */
+    protected zoom(amount: number, e: Event): void;
+    /** Fires a zoom control UI event. */
+    protected fireZoomEvent(): void;
+    getFocusableElement(): SVGGElement;
+    getFocusableTree(): WorkspaceSvg;
+    onNodeFocus(): void;
+    onNodeBlur(): void;
+    canBeFocused(): boolean;
+    abstract performAction(_e: Event): void;
+    dispose(): void;
+}
 /**
  * Class for a zoom controls.
  */
@@ -23,18 +55,12 @@ export declare class ZoomControls implements IPositionable {
      * ComponentManager.
      */
     id: string;
-    /**
-     * Array holding info needed to unbind events.
-     * Used for disposing.
-     * Ex: [[node, name, func], [node, name, func]].
-     */
-    private boundEvents;
-    /** The zoom in svg <g> element. */
-    private zoomInGroup;
-    /** The zoom out svg <g> element. */
-    private zoomOutGroup;
-    /** The zoom reset svg <g> element. */
-    private zoomResetGroup;
+    /** The zoom in control. */
+    private zoomInControl;
+    /** The zoom out control. */
+    private zoomOutControl;
+    /** The zoom reset control. */
+    private zoomResetControl;
     /** Width of the zoom controls. */
     private readonly WIDTH;
     /** Height of each zoom control. */
@@ -90,45 +116,12 @@ export declare class ZoomControls implements IPositionable {
      */
     position(metrics: UiMetrics, savedPositions: Rect[]): void;
     /**
-     * Create the zoom in icon and its event handler.
+     * Returns the individual zoom control, if any, with the given ID. Used for
+     * focus management.
      *
-     * @param rnd The random string to use as a suffix in the clip path's ID.
-     *     These IDs must be unique in case there are multiple Blockly instances
-     *     on the same page.
+     * @internal
      */
-    private createZoomOutSvg;
-    /**
-     * Create the zoom out icon and its event handler.
-     *
-     * @param rnd The random string to use as a suffix in the clip path's ID.
-     *     These IDs must be unique in case there are multiple Blockly instances
-     *     on the same page.
-     */
-    private createZoomInSvg;
-    /**
-     * Handles a mouse down event on the zoom in or zoom out buttons on the
-     *    workspace.
-     *
-     * @param amount Amount of zooming. Negative amount values zoom out, and
-     *     positive amount values zoom in.
-     * @param e A mouse down event.
-     */
-    private zoom;
-    /**
-     * Create the zoom reset icon and its event handler.
-     *
-     * @param rnd The random string to use as a suffix in the clip path's ID.
-     *     These IDs must be unique in case there are multiple Blockly instances
-     *     on the same page.
-     */
-    private createZoomResetSvg;
-    /**
-     * Handles a mouse down event on the reset zoom button on the workspace.
-     *
-     * @param e A mouse down event.
-     */
-    private resetZoom;
-    /** Fires a zoom control UI event. */
-    private fireZoomEvent;
+    getControlWithId(id: string): ZoomControl | undefined;
 }
+export {};
 //# sourceMappingURL=zoom_controls.d.ts.map
