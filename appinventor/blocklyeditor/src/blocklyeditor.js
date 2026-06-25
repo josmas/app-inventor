@@ -965,9 +965,8 @@ Blockly.BlocklyEditor['create'] = function(container, formName, readOnly, rtl) {
     Blockly.BlocklyEditor['cssRegistered'] = true;
     try {
       Blockly.Css.register(`
-.blocklyZoom:hover, .blocklyTrash:hover, .blocklyMultiselect:hover { cursor: pointer; }
+.blocklyZoom:hover, .blocklyTrash:hover { cursor: pointer; }
 .blocklyZoom>image, .blocklyZoom>image:hover { opacity: 1.0; }
-.blocklyMultiselect>image, .blocklyMultiselect>image:hover { opacity: 1.0; }
 .blocklyTrash { opacity: 1.0 !important; }
 `);
       KeyboardNavigation.registerKeyboardNavigationStyles();
@@ -996,23 +995,14 @@ Blockly.BlocklyEditor['create'] = function(container, formName, readOnly, rtl) {
       connectionPreviewer: decoratePreviewer(Blockly.InsertionMarkerPreviewer),
       [Blockly.registry.Type.CONNECTION_CHECKER]: 'CustomizableConnectionChecker',
     },
-    useDoubleClick: true,
-    bumpNeighbours: true,
-    multiselectIcon: {
-      hideIcon: false,
-      enabledIcon: 'static/images/select.svg',
-      disabledIcon: 'static/images/unselect.svg',
-    },
-    multiselectCopyPaste: {
-      crossTab: true,
-      menu: true,
-    },
     renderer: 'geras2_renderer',
   };
   var workspace = Blockly.inject(container, options);
-  AI.Blockly.multiselect = Multiselect;
-  var multiselectPlugin = new AI.Blockly.multiselect(workspace);
-  multiselectPlugin.init(options);
+  AI.Blockly.multiselect = {
+    withoutMultiFieldUpdates: function(callback) {
+      callback();
+    }
+  };
   var lexicalVariablesPlugin = LexicalVariablesPlugin;
   lexicalVariablesPlugin.init(workspace);
   var searchPlugin = new WorkspaceSearch(workspace);
@@ -1028,20 +1018,6 @@ Blockly.BlocklyEditor['create'] = function(container, formName, readOnly, rtl) {
   });
   if (!AI.Blockly.keyboardNavigation) {
     AI.Blockly.keyboardNavigation = new KeyboardNavigation(workspace);
-    multiselectPlugin.onKeyboardNavigationInit({
-      instance: AI.Blockly.keyboardNavigation,
-      shortcutKeybindings: {
-        toolbox: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.T],
-        clean_up_workspace: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.C],
-        list_shortcuts: [Blockly.utils.KeyCodes.CTRL_CMD, Blockly.utils.KeyCodes.SLASH],
-        disconnect: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.X],
-        start_move: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.M],
-        duplicate: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.SHIFT, Blockly.utils.KeyCodes.D],
-        next_stack: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.N],
-        previous_stack: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.B],
-        to_workspace: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.W],
-      },
-    });
   }
   Blockly.allWorkspaces[formName] = workspace;
   workspace.formName = formName;
