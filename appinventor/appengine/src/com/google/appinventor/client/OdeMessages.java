@@ -5898,4 +5898,7 @@ public interface OdeMessages extends Messages, ComponentTranslations {
 
   @DefaultMessage("10 minutes")
   String timeInterval10Minutes();
+
+  @DefaultMessage("Select All Projects")
+  String selectAllProjects();
 }
