@@ -47,18 +47,18 @@ public class ShowShortcutsAction implements Command {
   static final List<ShortcutDef> SHORTCUTS = new ArrayList<>();
 
   static {
-    SHORTCUTS.add(new ShortcutDef("focus_search",        "Focus Component search box",      "191",              true));
-    SHORTCUTS.add(new ShortcutDef("focus_tree",          "Focus Components tree",           "84",               true));
-    SHORTCUTS.add(new ShortcutDef("focus_viewer",        "Focus Viewer",                    "86",               true));
-    SHORTCUTS.add(new ShortcutDef("focus_properties",    "Focus Properties Panel",          "80",               true));
-    SHORTCUTS.add(new ShortcutDef("focus_media",         "Focus Media Panel",               "77",               true));
-    SHORTCUTS.add(new ShortcutDef("toggle_view",         "Switch Designer / Blocks",        "Control+Alt",      false));
-    SHORTCUTS.add(new ShortcutDef("rename_component",    "Rename Component",                "Alt+78",           true));
-    SHORTCUTS.add(new ShortcutDef("delete_component",    "Delete Component",                "Delete/Backspace", false));
-    SHORTCUTS.add(new ShortcutDef("reset_connection",    "Reset Connection",                "Alt+Shift+82",     true));
-    SHORTCUTS.add(new ShortcutDef("refresh_companion",   "Refresh Companion",               "Alt+82",           true));
-    SHORTCUTS.add(new ShortcutDef("navigate_components", "Navigate Components",             "↑/↓",              false));
-    SHORTCUTS.add(new ShortcutDef("show_shortcuts",      "Open this dialog",               "Alt+191",          false));
+    SHORTCUTS.add(new ShortcutDef("focus_search",        MESSAGES.shortcutFocusSearch(),        "191",              true));
+    SHORTCUTS.add(new ShortcutDef("focus_tree",          MESSAGES.shortcutFocusTree(),           "84",               true));
+    SHORTCUTS.add(new ShortcutDef("focus_viewer",        MESSAGES.shortcutFocusViewer(),         "86",               true));
+    SHORTCUTS.add(new ShortcutDef("focus_properties",    MESSAGES.shortcutFocusProperties(),     "80",               true));
+    SHORTCUTS.add(new ShortcutDef("focus_media",         MESSAGES.shortcutFocusMedia(),          "77",               true));
+    SHORTCUTS.add(new ShortcutDef("toggle_view",         MESSAGES.shortcutToggleView(),          "Control+Alt",      false));
+    SHORTCUTS.add(new ShortcutDef("rename_component",    MESSAGES.shortcutRenameComponent(),     "Alt+78",           true));
+    SHORTCUTS.add(new ShortcutDef("delete_component",    MESSAGES.shortcutDeleteComponent(),     "Delete/Backspace", false));
+    SHORTCUTS.add(new ShortcutDef("reset_connection",    MESSAGES.shortcutResetConnection(),     "Alt+Shift+82",     true));
+    SHORTCUTS.add(new ShortcutDef("refresh_companion",   MESSAGES.shortcutRefreshCompanion(),    "Alt+82",           true));
+    SHORTCUTS.add(new ShortcutDef("navigate_components", MESSAGES.shortcutNavigateComponents(),  "↑/↓",              false));
+    SHORTCUTS.add(new ShortcutDef("show_shortcuts",      MESSAGES.shortcutOpenDialog(),          "Alt+191",          false));
   }
 
   // Guard: Alt+/ handler is global; only the first instance should register it.
@@ -75,7 +75,7 @@ public class ShowShortcutsAction implements Command {
 
   public ShowShortcutsAction() {
     db = new DialogBox(true, false);
-    db.setText("Keyboard Shortcuts");
+    db.setText(MESSAGES.shortcutsDialogTitle());
     db.setStyleName("ode-DialogBox");
     db.setWidth("520px");
     db.setGlassEnabled(true);
@@ -84,7 +84,7 @@ public class ShowShortcutsAction implements Command {
     // ARIA: outer element is the dialog landmark
     db.getElement().setAttribute("role", "dialog");
     db.getElement().setAttribute("aria-modal", "true");
-    db.getElement().setAttribute("aria-label", "Keyboard Shortcuts");
+    db.getElement().setAttribute("aria-label", MESSAGES.shortcutsDialogTitle());
     // GWT's DecoratedPopupPanel renders a 3x3 <table> for decoration; hide it from AT
     db.getElement().getFirstChildElement().setAttribute("role", "presentation");
 
@@ -102,7 +102,7 @@ public class ShowShortcutsAction implements Command {
 
     table = buildTable();
 
-    editButton = new TextButton("Edit Shortcuts");
+    editButton = new TextButton(MESSAGES.shortcutsEditButton());
     editButton.addClickHandler(event -> {
       if (editMode) {
         exitEditMode();
@@ -111,7 +111,7 @@ public class ShowShortcutsAction implements Command {
       }
     });
 
-    resetButton = new TextButton("Reset All to Defaults");
+    resetButton = new TextButton(MESSAGES.shortcutsResetAllButton());
     resetButton.setEnabled(hasOverrides());
     resetButton.addClickHandler(event -> {
       cancelCapture();
@@ -157,8 +157,8 @@ public class ShowShortcutsAction implements Command {
     t.setText(0, 1, "");
     t.getRowFormatter().addStyleName(0, "ode-table-header");
     // FlexTable always creates <td>; replace with <th scope="col"> for accessibility
-    promoteToColumnHeader(t, 0, "Action", "70%");
-    promoteToColumnHeader(t, 1, "Keys",   "30%");
+    promoteToColumnHeader(t, 0, MESSAGES.shortcutsColumnAction(), "70%");
+    promoteToColumnHeader(t, 1, MESSAGES.shortcutsColumnKeys(),   "30%");
 
     keyLabels = new Label[SHORTCUTS.size()];
     for (int i = 0; i < SHORTCUTS.size(); i++) {
@@ -182,7 +182,7 @@ public class ShowShortcutsAction implements Command {
 
   private void enterEditMode() {
     editMode = true;
-    setTextAllFaces(editButton, "Done Editing");
+    setTextAllFaces(editButton, MESSAGES.shortcutsEditDoneButton());
     updateAllKeyCells();
   }
 
@@ -191,7 +191,7 @@ public class ShowShortcutsAction implements Command {
     activeCapture = null;
     editMode = false;
     if (editButton != null) {
-      setTextAllFaces(editButton, "Edit Shortcuts");
+      setTextAllFaces(editButton, MESSAGES.shortcutsEditButton());
     }
     updateAllKeyCells();
   }
@@ -212,7 +212,7 @@ public class ShowShortcutsAction implements Command {
     label.removeStyleName("ode-shortcut-editable");
     label.removeStyleName("ode-shortcut-locked");
     if (s == activeCapture) {
-      label.setText("Press a key…");
+      label.setText(MESSAGES.shortcutsPressKey());
       label.addStyleName("ode-shortcut-capturing");
     } else {
       label.setText(toDisplayString(s.currentKey));
