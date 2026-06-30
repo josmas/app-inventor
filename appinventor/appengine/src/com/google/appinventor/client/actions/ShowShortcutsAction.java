@@ -8,6 +8,7 @@ package com.google.appinventor.client.actions;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
+import com.google.appinventor.client.utils.ShortcutRegistry;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -21,9 +22,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ShowShortcutsAction implements Command {
 
@@ -46,8 +45,6 @@ public class ShowShortcutsAction implements Command {
   // Shared across dialog opens so remaps persist within a session
   static final List<ShortcutDef> SHORTCUTS = new ArrayList<>();
 
-  private static final Map<Integer, String> KEY_NAMES = new HashMap<>();
-
   static {
     SHORTCUTS.add(new ShortcutDef("focus_search",        "Focus Component search box",      "191",              true));
     SHORTCUTS.add(new ShortcutDef("focus_tree",          "Focus Components tree",           "84",               true));
@@ -61,18 +58,6 @@ public class ShowShortcutsAction implements Command {
     SHORTCUTS.add(new ShortcutDef("refresh_companion",   "Refresh Companion",               "Alt+82",           true));
     SHORTCUTS.add(new ShortcutDef("navigate_components", "Navigate Components",             "↑/↓",              false));
     SHORTCUTS.add(new ShortcutDef("show_shortcuts",      "Open this dialog",               "Alt+191",          false));
-
-    KEY_NAMES.put(8,   "Backspace");
-    KEY_NAMES.put(9,   "Tab");
-    KEY_NAMES.put(13,  "Enter");
-    KEY_NAMES.put(27,  "Escape");
-    KEY_NAMES.put(32,  "Space");
-    KEY_NAMES.put(37,  "←");
-    KEY_NAMES.put(38,  "↑");
-    KEY_NAMES.put(39,  "→");
-    KEY_NAMES.put(40,  "↓");
-    KEY_NAMES.put(46,  "Delete");
-    KEY_NAMES.put(191, "/");
   }
 
   // Guard: Alt+/ handler is global; only the first instance should register it.
@@ -279,42 +264,12 @@ public class ShowShortcutsAction implements Command {
     if (key == null || key.isEmpty()) {
       return "";
     }
-    // Pass through display-only strings containing slash separators or arrows
+    // Pass through display-only strings that are not valid serialized keys
     if (key.contains("/") || key.contains("↑") || key.contains("↓")
         || key.contains("←") || key.contains("→")) {
       return key;
     }
-    String[] parts = key.split("\\+");
-    StringBuilder sb = new StringBuilder();
-    for (String part : parts) {
-      if (sb.length() > 0) {
-        sb.append("+");
-      }
-      try {
-        int keyCode = Integer.parseInt(part);
-        String name = KEY_NAMES.get(keyCode);
-        if (name != null) {
-          sb.append(name);
-        } else if (keyCode >= 65 && keyCode <= 90) {
-          sb.append((char) keyCode);
-        } else {
-          sb.append(part);
-        }
-      } catch (NumberFormatException e) {
-        switch (part) {
-          case "Control":
-            sb.append("Ctrl");
-            break;
-          case "Meta":
-            sb.append("Cmd");
-            break;
-          default:
-            sb.append(part);
-            break;
-        }
-      }
-    }
-    return sb.toString();
+    return ShortcutRegistry.getShortcutKeys(key);
   }
 
   // Builds a Blockly-compatible serialized key string from a keydown event.
