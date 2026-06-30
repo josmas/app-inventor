@@ -202,6 +202,7 @@ public class ShowShortcutsAction implements Command {
     Label label = keyLabels[row - 1];
     label.removeStyleName("ode-shortcut-capturing");
     label.removeStyleName("ode-shortcut-editable");
+    label.removeStyleName("ode-shortcut-locked");
     if (s == activeCapture) {
       label.setText("Press a key…");
       label.addStyleName("ode-shortcut-capturing");
@@ -209,6 +210,8 @@ public class ShowShortcutsAction implements Command {
       label.setText(toDisplayString(s.currentKey));
       if (editMode && s.remappable) {
         label.addStyleName("ode-shortcut-editable");
+      } else if (editMode && !s.remappable) {
+        label.addStyleName("ode-shortcut-locked");
       }
     }
   }
