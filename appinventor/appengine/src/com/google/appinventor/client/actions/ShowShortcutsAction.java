@@ -9,12 +9,12 @@ package com.google.appinventor.client.actions;
 import static com.google.appinventor.client.Ode.MESSAGES;
 
 import com.google.appinventor.client.utils.ShortcutRegistry;
+import com.google.appinventor.client.widgets.TextButton;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -66,8 +66,8 @@ public class ShowShortcutsAction implements Command {
   private final DialogBox db;
   private FlexTable table;
   private Label[] keyLabels;   // one per SHORTCUTS row; updated in place, never replaced
-  private Button editButton;
-  private Button resetButton;
+  private TextButton editButton;
+  private TextButton resetButton;
   private boolean editMode = false;
   private ShortcutDef activeCapture = null;
   private HandlerRegistration captureHandler;
@@ -94,7 +94,7 @@ public class ShowShortcutsAction implements Command {
 
     table = buildTable();
 
-    editButton = new Button("Edit Shortcuts");
+    editButton = new TextButton("Edit Shortcuts");
     editButton.addClickHandler(event -> {
       if (editMode) {
         exitEditMode();
@@ -103,7 +103,7 @@ public class ShowShortcutsAction implements Command {
       }
     });
 
-    resetButton = new Button("Reset All to Defaults");
+    resetButton = new TextButton("Reset All to Defaults");
     resetButton.setEnabled(hasOverrides());
     resetButton.addClickHandler(event -> {
       cancelCapture();
@@ -115,7 +115,7 @@ public class ShowShortcutsAction implements Command {
       updateAllKeyCells();
     });
 
-    Button ok = new Button(MESSAGES.okButton());
+    TextButton ok = new TextButton(MESSAGES.okButton());
     ok.addClickHandler(event -> {
       cancelCapture();
       exitEditMode();
@@ -174,7 +174,7 @@ public class ShowShortcutsAction implements Command {
 
   private void enterEditMode() {
     editMode = true;
-    editButton.setText("Done Editing");
+    setTextAllFaces(editButton, "Done Editing");
     updateAllKeyCells();
   }
 
@@ -183,7 +183,7 @@ public class ShowShortcutsAction implements Command {
     activeCapture = null;
     editMode = false;
     if (editButton != null) {
-      editButton.setText("Edit Shortcuts");
+      setTextAllFaces(editButton, "Edit Shortcuts");
     }
     updateAllKeyCells();
   }
@@ -200,12 +200,16 @@ public class ShowShortcutsAction implements Command {
   // Updates the label text and style for one row — never replaces the widget.
   private void updateKeyCell(ShortcutDef s, int row) {
     Label label = keyLabels[row - 1];
+    label.removeStyleName("ode-shortcut-capturing");
+    label.removeStyleName("ode-shortcut-editable");
     if (s == activeCapture) {
       label.setText("Press a key…");
-      label.setStyleName("ode-shortcut-capturing");
+      label.addStyleName("ode-shortcut-capturing");
     } else {
       label.setText(toDisplayString(s.currentKey));
-      label.setStyleName(editMode && s.remappable ? "ode-shortcut-editable" : "");
+      if (editMode && s.remappable) {
+        label.addStyleName("ode-shortcut-editable");
+      }
     }
   }
 
@@ -248,6 +252,14 @@ public class ShowShortcutsAction implements Command {
       captureHandler.removeHandler();
       captureHandler = null;
     }
+  }
+
+  // PushButton.setText() only updates the UP face; this keeps all faces in sync.
+  private static void setTextAllFaces(TextButton button, String text) {
+    button.getUpFace().setText(text);
+    button.getUpHoveringFace().setText(text);
+    button.getDownFace().setText(text);
+    button.getDownHoveringFace().setText(text);
   }
 
   private static boolean hasOverrides() {
