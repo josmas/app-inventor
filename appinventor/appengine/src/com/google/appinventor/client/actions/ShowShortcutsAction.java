@@ -10,6 +10,8 @@ import static com.google.appinventor.client.Ode.MESSAGES;
 
 import com.google.appinventor.client.utils.ShortcutRegistry;
 import com.google.appinventor.client.widgets.TextButton;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -17,9 +19,8 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +81,13 @@ public class ShowShortcutsAction implements Command {
     db.setGlassEnabled(true);
     db.setAnimationEnabled(true);
 
+    // ARIA: outer element is the dialog landmark
+    db.getElement().setAttribute("role", "dialog");
+    db.getElement().setAttribute("aria-modal", "true");
+    db.getElement().setAttribute("aria-label", "Keyboard Shortcuts");
+    // GWT's DecoratedPopupPanel renders a 3x3 <table> for decoration; hide it from AT
+    db.getElement().getFirstChildElement().setAttribute("role", "presentation");
+
     if (!handlerRegistered) {
       handlerRegistered = true;
       registerGlobalHandler();
@@ -122,14 +130,13 @@ public class ShowShortcutsAction implements Command {
       db.hide();
     });
 
-    HorizontalPanel buttons = new HorizontalPanel();
-    buttons.setSpacing(4);
+    FlowPanel buttons = new FlowPanel();
+    buttons.addStyleName("ode-shortcut-buttons");
     buttons.add(resetButton);
     buttons.add(editButton);
     buttons.add(ok);
 
-    VerticalPanel panel = new VerticalPanel();
-    panel.setWidth("100%");
+    FlowPanel panel = new FlowPanel();
     panel.add(table);
     panel.add(buttons);
 
@@ -146,11 +153,12 @@ public class ShowShortcutsAction implements Command {
     t.setWidth("100%");
     t.getElement().getStyle().setProperty("tableLayout", "fixed");
 
-    t.setText(0, 0, "Action");
-    t.setText(0, 1, "Keys");
-    t.getCellFormatter().setWidth(0, 0, "70%");
-    t.getCellFormatter().setWidth(0, 1, "30%");
+    t.setText(0, 0, "");
+    t.setText(0, 1, "");
     t.getRowFormatter().addStyleName(0, "ode-table-header");
+    // FlexTable always creates <td>; replace with <th scope="col"> for accessibility
+    promoteToColumnHeader(t, 0, "Action", "70%");
+    promoteToColumnHeader(t, 1, "Keys",   "30%");
 
     keyLabels = new Label[SHORTCUTS.size()];
     for (int i = 0; i < SHORTCUTS.size(); i++) {
@@ -255,6 +263,16 @@ public class ShowShortcutsAction implements Command {
       captureHandler.removeHandler();
       captureHandler = null;
     }
+  }
+
+  // Replaces a FlexTable <td> in row 0 with a <th scope="col"> for accessibility.
+  private static void promoteToColumnHeader(FlexTable t, int col, String text, String width) {
+    Element th = Document.get().createElement("th");
+    th.setAttribute("scope", "col");
+    th.getStyle().setProperty("width", width);
+    th.setInnerText(text);
+    Element td = t.getCellFormatter().getElement(0, col);
+    td.getParentElement().replaceChild(th, td);
   }
 
   // PushButton.setText() only updates the UP face; this keeps all faces in sync.

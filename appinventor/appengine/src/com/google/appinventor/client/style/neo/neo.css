@@ -1423,6 +1423,12 @@ path.ode-SimpleMockMapFeature-selected {
   cursor: default;
 }
 
+.ode-shortcut-buttons {
+  display: flex;
+  gap: 8px;
+  padding: 10px 0;
+}
+
 .ode-FormCheckboxLabel {
   display: inline-block;
   margin: 10px;
