@@ -25,6 +25,7 @@ public class TopToolbarNeo extends TopToolbar {
   @UiField DropDownButton connectDropDown;
   @UiField DropDownButton buildDropDown;
   @UiField DropDownButton settingsDropDown;
+  @UiField DropDownButton helpDropDown;
   @UiField DropDownButton adminDropDown;
   @UiField (provided = true) Boolean hasWriteAccess;
   @UiField (provided = true) Boolean isAvailable;
