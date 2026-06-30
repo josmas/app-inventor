@@ -182,7 +182,7 @@ public class ShowShortcutsAction implements Command {
 
   private void enterEditMode() {
     editMode = true;
-    setTextAllFaces(editButton, MESSAGES.shortcutsEditDoneButton());
+    editButton.setText(MESSAGES.shortcutsEditDoneButton());
     updateAllKeyCells();
   }
 
@@ -191,7 +191,7 @@ public class ShowShortcutsAction implements Command {
     activeCapture = null;
     editMode = false;
     if (editButton != null) {
-      setTextAllFaces(editButton, MESSAGES.shortcutsEditButton());
+      editButton.setText(MESSAGES.shortcutsEditButton());
     }
     updateAllKeyCells();
   }
@@ -273,14 +273,6 @@ public class ShowShortcutsAction implements Command {
     th.setInnerText(text);
     Element td = t.getCellFormatter().getElement(0, col);
     td.getParentElement().replaceChild(th, td);
-  }
-
-  // PushButton.setText() only updates the UP face; this keeps all faces in sync.
-  private static void setTextAllFaces(TextButton button, String text) {
-    button.getUpFace().setText(text);
-    button.getUpHoveringFace().setText(text);
-    button.getDownFace().setText(text);
-    button.getDownHoveringFace().setText(text);
   }
 
   private static boolean hasOverrides() {
