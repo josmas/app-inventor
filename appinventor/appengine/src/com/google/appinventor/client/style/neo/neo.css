@@ -1417,17 +1417,6 @@ path.ode-SimpleMockMapFeature-selected {
   color: gray-700;
 }
 
-.ode-DialogBox .ode-shortcut-locked {
-  font-style: italic;
-  opacity: 0.5;
-  cursor: default;
-}
-
-.ode-shortcut-buttons {
-  display: flex;
-  gap: 8px;
-  padding: 10px 0;
-}
 
 .ode-FormCheckboxLabel {
   display: inline-block;
