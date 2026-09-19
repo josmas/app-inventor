@@ -1,0 +1,31 @@
+---
+layout: default
+---
+{%- assign docs = site.docs | sort: "order" -%}
+{%- for d in docs -%}
+  {%- if d.url == page.url -%}
+    {%- assign prev_i = forloop.index0 | minus: 1 -%}
+    {%- assign next_i = forloop.index0 | plus: 1 -%}
+    {%- unless forloop.first -%}{%- assign prev_doc = docs[prev_i] -%}{%- endunless -%}
+    {%- unless forloop.last -%}{%- assign next_doc = docs[next_i] -%}{%- endunless -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<article class="post">
+  <header class="post-header">
+    <h1 class="post-title">{{ page.title | escape }}</h1>
+  </header>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  <nav class="doc-nav">
+    {%- if prev_doc -%}
+      <a class="doc-prev" href="{{ prev_doc.url | relative_url }}">&larr; {{ prev_doc.title | escape }}</a>
+    {%- endif -%}
+    {%- if next_doc -%}
+      <a class="doc-next" style="float: right;" href="{{ next_doc.url | relative_url }}">{{ next_doc.title | escape }} &rarr;</a>
+    {%- endif -%}
+  </nav>
+</article>
