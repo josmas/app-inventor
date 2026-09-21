@@ -54,6 +54,27 @@ defaults:
 # Build settings
 theme: minima
 
+# Sass deprecation warnings
+# Minima 2.5.2 (the last released version) is written in an older Sass dialect,
+# so every build printed dozens of deprecation warnings that come from the theme
+# rather than from this site. They are only warnings: the build succeeds and the
+# CSS is correct. We silence them to keep the build log readable:
+#   - color-functions: minima uses lighten()/darken() (superseded by color.adjust)
+#   - global-builtin:  minima calls those functions as globals, not via sass:color
+#   - import:          @import is deprecated in favour of @use. Minima uses it, and
+#                      so does our assets/main.scss (`@import "minima"`)
+#   quiet_deps hides warnings that originate in dependencies such as the theme.
+# These functions are deprecated, not removed. If a future Sass release removes
+# them the build will FAIL with a real error rather than a warning. At that point
+# either move to a maintained theme or override the affected minima styles.
+# To see the warnings again, delete this whole `sass:` block.
+sass:
+  quiet_deps: true
+  silence_deprecations:
+    - color-functions
+    - global-builtin
+    - import
+
 # Pages shown in the header nav (the home page is reached via the site title)
 header_pages:
   - about.markdown
