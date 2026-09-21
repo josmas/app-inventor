@@ -13,7 +13,7 @@ layout: default
 {%- endfor -%}
 
 <article class="post">
-  <nav class="back-link" aria-label="Back to list" style="font-size: 0.9em; margin-bottom: 1em;">
+  <nav class="back-link" aria-label="Back to list">
     <a href="{{ '/' | relative_url }}">&larr; Home</a>
   </nav>
 
@@ -30,7 +30,7 @@ layout: default
       <a class="doc-prev" href="{{ prev_doc.url | relative_url }}">&larr; {{ prev_doc.title | escape }}</a>
     {%- endif -%}
     {%- if next_doc -%}
-      <a class="doc-next" style="float: right;" href="{{ next_doc.url | relative_url }}">{{ next_doc.title | escape }} &rarr;</a>
+      <a class="doc-next" href="{{ next_doc.url | relative_url }}">{{ next_doc.title | escape }} &rarr;</a>
     {%- endif -%}
   </nav>
 </article>
