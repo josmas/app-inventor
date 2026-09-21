@@ -29,16 +29,25 @@ github_username: mit-cml
 app_inventor_support: https://community.appinventor.mit.edu/
 
 # Collections
-# Technical docs live in _docs/, ordered by the `order` front matter field.
+# Technical docs live in _docs/ and guides in _guides/. Each is ordered by the
+# `order` front matter field.
 collections:
   docs:
     output: true
     permalink: /docs/:path/
+  guides:
+    output: true
+    permalink: /guides/:path/
 
 defaults:
   - scope:
       path: ""
       type: docs
+    values:
+      layout: doc
+  - scope:
+      path: ""
+      type: guides
     values:
       layout: doc
 

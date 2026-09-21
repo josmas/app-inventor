@@ -1,7 +1,8 @@
 ---
 layout: default
 ---
-{%- assign docs = site.docs | sort: "order" -%}
+{%- comment -%} Prev/next stay within the page's own collection (docs or guides). {%- endcomment -%}
+{%- assign docs = site[page.collection] | sort: "order" -%}
 {%- for d in docs -%}
   {%- if d.url == page.url -%}
     {%- assign prev_i = forloop.index0 | minus: 1 -%}
