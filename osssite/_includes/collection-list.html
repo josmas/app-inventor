@@ -7,7 +7,7 @@
 {%- if items.size > 0 -%}
 {%- assign shown = items | slice: 0, limit -%}
 {%- assign extra = items | slice: limit, items.size -%}
-<h2>{{ include.title }}</h2>
+<h2 id="{{ include.collection }}">{{ include.title }}</h2>
 <ol>
   {%- for item in shown %}
   <li><a href="{{ item.url | relative_url }}">{{ item.title | escape }}</a></li>
