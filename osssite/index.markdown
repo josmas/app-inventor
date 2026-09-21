@@ -1,6 +1,12 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
-layout: home
+layout: page
+title: Docs
+permalink: /
 ---
+
+{%- assign docs = site.docs | sort: "order" %}
+<ol>
+{%- for doc in docs %}
+  <li><a href="{{ doc.url | relative_url }}">{{ doc.title | escape }}</a></li>
+{%- endfor %}
+</ol>

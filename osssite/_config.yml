@@ -19,7 +19,6 @@
 # in the templates via {{ site.myvariable }}.
 
 title: App Inventor Open Source Site
-email: info@appinventor.mit.edu
 description: >- # this means to ignore newlines until "baseurl:"
   News, announcements and development guides for MIT App Inventor.
   Follow us to be up to date.
@@ -27,6 +26,7 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: mitappinventor
 github_username: mit-cml
+app_inventor_support: https://community.appinventor.mit.edu/
 
 # Collections
 # Technical docs live in _docs/, ordered by the `order` front matter field.
@@ -44,8 +44,10 @@ defaults:
 
 # Build settings
 theme: minima
-plugins:
-  - jekyll-feed
+
+# Pages shown in the header nav (the home page is reached via the site title)
+header_pages:
+  - about.markdown
 
 # Exclude from processing.
 # The following items will not be processed, by default.
