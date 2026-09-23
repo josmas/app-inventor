@@ -82,6 +82,91 @@ strong, b {
   }
 }
 
+// External resources: deliberately unlike .doc-list (tinted rows, accent bar,
+// icon badge and a trailing "external link" arrow) so they read as leaving the site.
+.resource-list {
+  list-style: none;
+  margin: 0 0 $spacing-unit;
+  padding: 0;
+
+  li {
+    margin: 0 0 0.6em;
+  }
+}
+
+.post-content h2.section-title-small {
+  font-size: 1.3rem;
+}
+
+.resource {
+  --accent: #{$aio-purple};
+  font-size: 0.85em; // whole row (text, icon badge, padding) sits below the Docs/Guides cards
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  padding: 0.7em 1.1em 0.7em 0.9em;
+  border-left: 4px solid var(--accent);
+  border-radius: 4px 12px 12px 4px;
+  background-color: rgba($aio-purple, 0.05);
+  color: $text-color;
+  transition: background-color 0.15s;
+
+  &.resource-talk,
+  &.resource-video {
+    --accent: #{$aio-orange};
+    background-color: rgba($aio-orange, 0.08);
+  }
+
+  &:hover {
+    background-color: rgba($aio-purple, 0.12);
+    text-decoration: none;
+
+    &.resource-talk,
+    &.resource-video {
+      background-color: rgba($aio-orange, 0.18);
+    }
+
+    .resource-external {
+      transform: translate(2px, -2px);
+    }
+  }
+}
+
+.resource-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6em;
+  height: 2.6em;
+  border-radius: 50%;
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.resource-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+}
+
+.resource-title {
+  font-weight: 400;
+}
+
+.resource-meta {
+  font-size: 0.8em;
+  color: $grey-color;
+}
+
+.resource-external {
+  flex: none;
+  color: var(--accent);
+  transition: transform 0.15s;
+}
+
 // "Show N more" fold, styled as the rounded green button from appinventor.org
 details {
   margin-bottom: $spacing-unit;
