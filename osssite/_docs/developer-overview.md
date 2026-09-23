@@ -4,11 +4,13 @@ order: 1
 ---
 
 - TOC
-  {:toc}
+{:toc}
 
 ## 1. Introduction
 
 This document provides a high-level overview of the App Inventor source code, including the toolkits and libraries on which App Inventor depends, the different sub-projects within App Inventor, and information flow during the build process and execution.
+
+For completeness, the original (outdated) version of this document can be found [here](https://docs.google.com/document/u/0/d/1hIvAtbNx-eiIJcTA2LLPQOawctiGIpnnt0AvfgnKBok/pub).
 
 ## 2. Background
 
@@ -29,16 +31,16 @@ The system still follows the original implementation API for the [Objectify](htt
 ```mermaid
 %%{init: {"flowchart": {"rankSpacing": 40, "nodeSpacing": 2, "subGraphTitleMargin": {"bottom": 12}}}}%%
 flowchart LR
-  subgraph client["App Inventor client"]
+  subgraph client["App Inventor Client"]
     direction TB
     gc["<div style='width:125px'>GWT client</div>"]
     wb["<div style='width:125px'>Web browser</div>"]
     gc --> wb
   end
-  subgraph server["App Inventor server"]
+  subgraph server["App Inventor Server"]
     direction TB
-    ob["<div style='width:125px'>Objectify/StorageIO</div>"]
-    jt["<div style='width:125px'>Jetty Servlet container</div>"]
+    ob["<div style='width:165px'>Objectify/StorageIO</div>"]
+    jt["<div style='width:165px'>Jetty Servlet container</div>"]
     ob --> jt
   end
   subgraph db["App Inventor Database"]
@@ -271,7 +273,3 @@ There are two types of releases that we make on our public service. The more sig
 By comparison "non component releases" are where we do not update components. For example changes to the App Inventor blocks layer, or other features of the Website itself. They can usually be backed out if there is a problem and they do require action on the part of App Inventor programmers.
 
 Because we do not wish to do component releases too often, we do not always want to checking changes to the master branch which contain component changes. Instead we have a new branch named "ucr" where we will be merging component changes that pass review. When it comes time to do a Component Release, we will merge the ucr branch into the master branch prior to the release.
-
-## 8. GitHub and Gerrit Reviews
-
-Changes to MIT App Inventor should be made via the [GitHub Workflow](https://docs.google.com/document/d/1sAw0QObTxTWqRX7GQRCa2z9TIV2r5AKT9UKMFF1acZI/pub). In general we will not use GitHub to merge in changes. Instead after reviewing a change the release coordinators will squash your commits down to a single commit which will either be rebased on the master branch (non component change) or onto the ucr branch (component changes). Often as part of this work we will submit your commit to our private "Gerrit" review server which will arrange for automated running of our unit tests via the "Jenkins" continuous integration system. In general you do not need to be aware of this level of detail. Sometimes internal changes bypass the GitHub workflow and are reviewed directly on Gerrit, though this is happening less often now.
