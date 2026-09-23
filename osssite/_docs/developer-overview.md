@@ -4,7 +4,7 @@ order: 1
 ---
 
 - TOC
-{:toc}
+  {:toc}
 
 ## 1. Introduction
 
@@ -23,36 +23,40 @@ Note that the original version of App Inventor used a combination of GWT (client
 ### 2.2 Jetty Web Server and PostgreSQL
 
 [Jetty](https://jetty.org/index.html) is an Eclipse project that provides an scalable and efficient web server and servlet container. All the backend logic is hosted by Jetty and backed by a PostgresQL database.
-The system still follows the original implementation API for the [Objectify](http://code.google.com/p/objectify-appengine/) datastore.
+
+The system still follows the original implementation API for the [Objectify](http://code.google.com/p/objectify-appengine/) datastore, which used to the implementation for StorageIO on App Engine. It has since then evolved outside of App Engine at [Objectify](https://github.com/objectify/objectify). The current App Engine implementation is now [Cloud Storage](https://docs.cloud.google.com/appengine/docs/standard/using-cloud-storage), but it is not used anymore.
 
 ```mermaid
-block-beta
-  columns 3
-  block:client
-    columns 1
-    ct["App Inventor client"]
-    gc["GWT client"]
-    wb["Web browser"]
+%%{init: {"flowchart": {"rankSpacing": 40, "nodeSpacing": 2, "subGraphTitleMargin": {"bottom": 12}}}}%%
+flowchart LR
+  subgraph client["App Inventor client"]
+    direction TB
+    gc["<div style='width:125px'>GWT client</div>"]
+    wb["<div style='width:125px'>Web browser</div>"]
+    gc --> wb
   end
-  space
-  block:server
-    columns 1
-    st["App Inventor server"]
-    ob["Objectify"]
-    jt["Jetty Servlet container"]
+  subgraph server["App Inventor server"]
+    direction TB
+    ob["<div style='width:125px'>Objectify/StorageIO</div>"]
+    jt["<div style='width:125px'>Jetty Servlet container</div>"]
+    ob --> jt
+  end
+  subgraph db["App Inventor Database"]
+    pg[("<div style='width:125px'>PostgreSQL</div>")]
   end
   client <--> server
-  style client fill:#dae8fc,stroke:#333
-  style server fill:#dae8fc,stroke:#333
-  style ct fill:none,stroke:none,color:#d00
-  style st fill:none,stroke:none,color:#d00
-  style gc fill:#dae8fc,stroke:#333
-  style wb fill:#dae8fc,stroke:#333
-  style ob fill:#dae8fc,stroke:#333
-  style jt fill:#dae8fc,stroke:#333
+  server <--> pg
+  classDef box fill:#dae8fc,stroke:#333,color:#000
+  class gc,wb,ob,jt,pg box
+  style client fill:#dae8fc,stroke:#333,color:#d00
+  style server fill:#dae8fc,stroke:#333,color:#d00
+  style db fill:none,stroke:none,color:#d00
+
+  %% Completely hides the arrows inside the subgraphs to keep them tightly stacked
+  linkStyle 0,1 stroke:transparent,stroke-width:0px;
 ```
 
-_Figure 1: The App Inventor client is created with GWT, which converts the front-end code into JavaScript, which is run with the GWT client library in the user's browser. The back-end runs on the Jetty server as standalone Java service, using the third-party Objectify API for data storage._
+_Figure 1: The App Inventor client is created with GWT, which converts the front-end code into JavaScript, which is run with the GWT client library in the user's browser. The back-end runs on the Jetty server as standalone Java service, using the third-party Objectify API for data storage, and using PostgreSQL for storage._
 
 ### 2.3 Android and iOS
 
