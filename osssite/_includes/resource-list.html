@@ -11,7 +11,7 @@
   {%- assign host = host[2] | remove: "www." -%}
   {%- assign kind = item.type | downcase -%}
   <li>
-    <a class="resource resource-{{ item.type | slugify }}" href="{{ item.url }}" rel="noopener">
+    <a class="resource resource-{{ item.type | slugify }}" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">
       <span class="resource-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           {%- case kind -%}

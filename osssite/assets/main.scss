@@ -82,6 +82,46 @@ strong, b {
   }
 }
 
+// Quicklinks: compact external-link pills under the intro text.
+.quicklinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6em;
+}
+
+.quicklink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.35em 1em;
+  border: 1px solid $grey-color-light;
+  border-radius: 999px;
+  color: $text-color;
+  font-weight: 400;
+  transition: border-color 0.15s, color 0.15s;
+
+  &:hover {
+    border-color: $aio-purple;
+    color: $aio-purple;
+    text-decoration: none;
+  }
+
+  .quicklink-external {
+    opacity: 0.6;
+  }
+}
+
+// Text for screen readers only
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 // External resources: deliberately unlike .doc-list (tinted rows, accent bar,
 // icon badge and a trailing "external link" arrow) so they read as leaving the site.
 .resource-list {
