@@ -78,22 +78,38 @@ You don't have to be an expert in both platforms, but you will certainly need th
 
 ## 3. App Inventor projects and directories
 
-The App Inventor distribution consists of the following subdirectories, the first seven of which contain source code for sub-projects:
+The App Inventor distribution lives in the `appinventor/` directory of the repository, and consists of the following subdirectories, which contain source code for sub-projects:
 
-- **aiphoneapp**: the interpreter that runs on the mobile device or emulator when it is connected to a computer running App Inventor.
-- **aiplayapp**: another version of the interpreter that runs on the mobile device or emulator when it is connected to a computer running App Inventor. This is what we call the MIT App Inventor Companion.
+- **aicompanionapp**: the source of the iOS version of the MIT App Inventor Companion (Swift and Objective-C), which is built on top of `components-ios`.
+- **aimerger**: a standalone desktop (Swing) tool that merges App Inventor projects, built with its own `build.xml`.
+- **aimerger_for_appinv_classic**: a variant of the merger tool for App Inventor classic projects.
+- **aiplayapp**: the source of the Android version of the interpreter that runs on the mobile device or emulator when it is connected to a computer running App Inventor. This is what we call the MIT App Inventor Companion.
 - **appengine**: the GWT application that provides the Designer JavaScript code to the client browser and provides supporting server-side functionality, such as storing and retrieving projects and issuing compile requests to the buildserver.
 - **blocklyeditor**: the Blocks Editor, embedded in the browser and powered by Blockly. Used by both blockseditor and buildserver.
 - **buildserver**: an http server/servlet that takes a source zip file as input and produces an apk and/or error messages.
 - **common**: constants and utility classes used by other sub-projects.
-- **components**: code supporting App Inventor components, including annotations, implementations, and scripts for extracting component information needed by other sub-projects. More information can be found in the documents:
+- **components**: code supporting App Inventor components, including annotations, implementations, and scripts for extracting component information needed by other sub-projects. More information can be found in the documents (Note that these documents are out of date and will be reworked soon):
   - [How to Add A Component](https://docs.google.com/document/pub?id=1xk9dMfczvjbbwD-wMsr-ffqkTlE3ga0ocCE1KOb2wvw)
   - [How to Add a Property to a Component](https://docs.google.com/document/pub?id=14c1X19s6pXYHdDBOJJELcmOghWbm2FPekRvGzX0ENps)
+- **components-common**: web assets shared by components, such as the HTML and JavaScript for the personal image and audio classifiers.
+- **components-ios**: the iOS implementation of the components, written in Swift (`AIComponentKit`).
+- **PlayerApp**: the Swift sources for the iOS Player app, which uses `AIComponentKit` to run App Inventor projects on iOS.
+- **schemekit**: an Objective-C Scheme interpreter (`SchemeKit`) used on iOS to run the Scheme/YAIL code generated from the blocks. It is the iOS counterpart of the Kawa runtime described above.
 
-The remaining two subdirectories contain static files:
+The following subdirectories contain static files, support tooling and dependencies:
 
-- **docs**: user-level documentation, such as tutorials.
+- **contrib**: contributor documentation, such as how component reference documentation is written in Javadoc comments.
+- **docs**: user-level documentation, such as tutorials, both the Jekyll markdown sources and the static HTML.
 - **lib**: external libraries, such as JUnit, used by the various sub-projects. They are listed below in [External Libraries](#5-external-libraries).
+- **misc**: assorted helper scripts and small tools, each in its own folder with a README where one exists. Among them are the buildserver launch and monitoring scripts (`buildserver`), a generator that scaffolds new components (`componentcreator`), the `aiStarter` emulator helper (`emulator-support`), translation tooling (`i18n`), the Companion `rendezvous` server (Node.js), and the `checkstyle`, `whitelist`, `splashscreen`, `passwordmail` and `popup` utilities.
+- **prebuilts**: prebuilt iOS binaries, currently the WebRTC framework for both device and simulator.
+
+The following are generated or third-party folders, or project files, that you will see next to the sources:
+
+- **build**: the output directory of the Ant build, with one subfolder per project. It is not checked in (it is git-ignored). The component information files described in section 4 are generated here.
+- **node_modules**: Node.js dependencies for the JavaScript tests (Karma, Mocha, Chai), as declared in `package.json`.
+- **Pods**: CocoaPods dependencies for the iOS projects, as declared in the `Podfile`.
+- **Xcode projects**: the `*.xcodeproj` and `*.xcworkspace` folders at the top level (`AICompanionApp`, `AIComponentKit`, `PlayerApp`, `SchemeKit`, `AppInventor`, `Schemekit`) are the Xcode entry points for the iOS code above.
 
 Figure 2-A shows where each of the projects' code runs. It is simplified in that it only shows the name of the project (e.g., blocklyeditor) and not specific build targets (e.g., BlocklyCompile). Greater detail can be found in documents on each project (yet to be written) and in the Ant build.xml files in each project's directory. Also note that the build server can be deployed in any cloud service, so any server accessible from the GAE server can be used (including locally in a development machine).
 
