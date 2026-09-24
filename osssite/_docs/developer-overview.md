@@ -111,15 +111,131 @@ The following are generated or third-party folders, or project files, that you w
 - **Pods**: CocoaPods dependencies for the iOS projects, as declared in the `Podfile`.
 - **Xcode projects**: the `*.xcodeproj` and `*.xcworkspace` folders at the top level (`AICompanionApp`, `AIComponentKit`, `PlayerApp`, `SchemeKit`, `AppInventor`, `Schemekit`) are the Xcode entry points for the iOS code above.
 
-Figure 2-A shows where each of the projects' code runs. It is simplified in that it only shows the name of the project (e.g., blocklyeditor) and not specific build targets (e.g., BlocklyCompile). Greater detail can be found in documents on each project (yet to be written) and in the Ant build.xml files in each project's directory. Also note that the build server can be deployed in any cloud service, so any server accessible from the GAE server can be used (including locally in a development machine).
+Figure 2 shows where each of the projects' code runs. It is simplified in that it only shows the name of the project (e.g., blocklyeditor) and not specific build targets (e.g., BlocklyCompile). Greater detail can be found in the Ant build.xml files in each project's directory. Also note that the build server can be deployed in any cloud service or locally in a development machine.
 
-![Figure 2-A: Components of the system and where they run]({{ '/assets/images/developer-overview/components-and-where-they-run.png' | relative_url }})
+```mermaid
+%%{init: {"flowchart": {"rankSpacing": 60, "nodeSpacing": 14, "curve": "linear", "subGraphTitleMargin": {"bottom": 6}}}}%%
+flowchart LR
+  subgraph client["Client computer"]
+    direction LR
+    subgraph ble["blocklyeditor"]
+      b["<div style='width:150px'>Blockly<br>Browser</div>"]
+    end
+    subgraph gwtc["appengine (client)"]
+      g["<div style='width:150px'>GWT client<br>Browser</div>"]
+    end
+  end
 
-_Figure 2-A: Components of the system and where they run. External infrastructure components are black, parts of App Inventor red._
+  subgraph phone["Mobile device or emulator"]
+    direction LR
+    subgraph play["aiplayapp"]
+      p["<div style='width:150px'>Companion app<br>Android</div>"]
+    end
+    subgraph comp["aicompanionapp"]
+      c["<div style='width:150px'>Companion app<br>iOS</div>"]
+    end
+  end
+
+  subgraph rdv["Rendezvous server"]
+    subgraph rdvp["misc/rendezvous"]
+      r["<div style='width:150px'>Node.js service<br>Docker</div>"]
+    end
+  end
+
+  subgraph server["App Inventor server"]
+    subgraph gwts["appengine (server)"]
+      s["<div style='width:190px'>GWT RPC servlets<br>StorageIo<br>Jetty servlet container</div>"]
+    end
+  end
+
+  subgraph store["App Inventor storage"]
+    pg[("<div style='width:110px'>PostgreSQL<br>projects, users</div>")]
+    s3b[("<div style='width:110px'>S3<br>assets</div>")]
+  end
+
+  subgraph bs["Build server"]
+    subgraph bsp["buildserver"]
+      k["<div style='width:235px'>Kawa + components library<br>Any cloud service</div>"]
+    end
+  end
+
+  client <-->|"GWT RPC"| server
+  server <-->|"SQL"| pg
+  server <-->|"assets"| s3b
+  server <-->|"build request / results"| bs
+  client <-->|"WebRTC or HTTP"| phone
+  client <-->|"pairing"| rdv
+  phone <-->|"pairing"| rdv
+
+  classDef layer fill:#dae8fc,stroke:#333,color:#000
+  class b,g,p,c,r,s,k,pg,s3b layer
+  style client fill:#f2f2f2,stroke:#888,color:#222
+  style phone fill:#f2f2f2,stroke:#888,color:#222
+  style rdv fill:#f2f2f2,stroke:#888,color:#222
+  style server fill:#f2f2f2,stroke:#888,color:#222
+  style store fill:#f2f2f2,stroke:#888,color:#222
+  style bs fill:#f2f2f2,stroke:#888,color:#222
+  style ble fill:#e8f0fb,stroke:#7a9cc6,color:#d00
+  style gwtc fill:#e8f0fb,stroke:#7a9cc6,color:#d00
+  style play fill:#e8f0fb,stroke:#7a9cc6,color:#d00
+  style comp fill:#e8f0fb,stroke:#7a9cc6,color:#d00
+  style rdvp fill:#e8f0fb,stroke:#7a9cc6,color:#d00
+  style gwts fill:#e8f0fb,stroke:#7a9cc6,color:#d00
+  style bsp fill:#e8f0fb,stroke:#7a9cc6,color:#d00
+```
+
+_Figure 2: The parts of App Inventor and where each one runs. Project directories are shown in red, and the arrows are labelled with how the parts communicate. The server runs on Jetty and stores data in PostgreSQL and S3 compatible services, the Rendezvous server only pairs the browser with the Companion, and the build server can be deployed in any cloud service._
 
 Figure 3 shows run-time communication among the different sub-projects.
 
-![Figure 3: Run-time communication among sub-projects]({{ '/assets/images/developer-overview/runtime-communication.png' | relative_url }})
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Companion<br>(device or emulator)
+  participant R as Rendezvous server
+  participant B as Browser<br>(GWT client + Blockly)
+  participant S as App Inventor server<br>(Jetty)
+  participant DB as PostgreSQL + S3
+  participant BS as Build server
+
+  rect rgb(232, 240, 251)
+    Note over B,DB: Editing a project
+    B->>S: Load project (GWT RPC)
+    S->>DB: Read project files and assets
+    S-->>B: Sources, assets, settings
+    B->>S: Save designer and blocks changes
+    S->>DB: Store project files and assets
+  end
+
+  rect rgb(255, 244, 229)
+    Note over C,B: Live testing with the Companion (the server is not involved)
+    B->>R: Post offer, keyed by the connection code
+    C->>R: Enter the code or scan the QR code
+    R-->>C: Browser's offer
+    C->>R: Post answer
+    R-->>B: Companion's answer
+    alt WebRTC available
+      B-->>C: Open a direct WebRTC data channel
+    else Legacy mode (same network)
+      B->>C: HTTP requests to the Companion on port 8001
+    end
+    B->>C: Blocks as YAIL code, and assets
+    C-->>B: Values, errors and events
+  end
+
+  rect rgb(233, 245, 233)
+    Note over B,BS: Building an app
+    B->>S: Build (GWT RPC)
+    S->>DB: Read project files
+    S->>BS: POST project source zip and a callback URL
+    BS->>S: Progress and result via the callback URL
+    S->>DB: Store build output
+    B->>S: Poll build status
+    S-->>B: Download link for the APK or IPA
+  end
+```
+
+_Figure 3: The main run-time interactions between the parts of App Inventor, in order: editing a project, testing live with a Companion (which does not involve the server), and building an app._
 
 ## 4. Component Information Files
 
