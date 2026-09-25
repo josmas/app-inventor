@@ -40,6 +40,12 @@ collections:
     permalink: /guides/:path/
 
 defaults:
+  # Image used by link previews (Open Graph and Twitter cards, e.g. in Slack).
+  # It needs an absolute URL, so `url` must be set (the Pages workflow sets it).
+  - scope:
+      path: ""
+    values:
+      image: /assets/appinventororg.png
   - scope:
       path: ""
       type: docs
